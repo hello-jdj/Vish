@@ -1,0 +1,57 @@
+from core.port_types import PortType
+from core.bash_emitter import BashContext
+from .base_node import BaseNode
+
+class RunCommandNode(BaseNode):
+    def __init__(self):
+        super().__init__("run_command", "Run Command", "#2ECC71")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Command", PortType.STRING)
+        self.add_output("Exec", PortType.EXEC)
+        self.add_output("Output", PortType.STRING)
+        self.properties["command"] = "ls"
+    
+    def emit_bash(self, context: BashContext) -> str:
+        command = self.properties.get("command", "")
+        
+        cmd_port = self.inputs[1]
+        if cmd_port.connected_edges:
+            source_node = cmd_port.connected_edges[0].source.node
+            command = source_node.properties.get("value", command)
+        
+        return command
+
+class EchoNode(BaseNode):
+    def __init__(self):
+        super().__init__("echo", "Echo", "#3498DB")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Text", PortType.STRING)
+        self.add_output("Exec", PortType.EXEC)
+        self.properties["text"] = "Hello"
+    
+    def emit_bash(self, context: BashContext) -> str:
+        text = self.properties.get("text", "")
+        
+        text_port = self.inputs[1]
+        if text_port.connected_edges:
+            source_node = text_port.connected_edges[0].source.node
+            text = source_node.properties.get("value", text)
+        
+        return f'echo "{text}"'
+
+class ExitNode(BaseNode):
+    def __init__(self):
+        super().__init__("exit", "Exit", "#E74C3C")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Code", PortType.INT)
+        self.properties["code"] = 0
+    
+    def emit_bash(self, context: BashContext) -> str:
+        code = self.properties.get("code", 0)
+        
+        code_port = self.inputs[1]
+        if code_port.connected_edges:
+            source_node = code_port.connected_edges[0].source.node
+            code = source_node.properties.get("value", code)
+        
+        return f"exit {code}"

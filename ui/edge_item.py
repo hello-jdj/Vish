@@ -1,0 +1,57 @@
+from PySide6.QtWidgets import QGraphicsPathItem
+from PySide6.QtCore import QPointF, Qt
+from PySide6.QtGui import QPainterPath, QPen, QColor
+from core.graph import Edge
+
+class EdgeItem(QGraphicsPathItem):
+    def __init__(self, edge=None, source_port=None, target_port=None):
+        super().__init__()
+        self.edge = edge
+        self.source_port = source_port
+        self.target_port = target_port
+
+        self.source_pos = QPointF()
+        self.target_pos = QPointF()
+
+        pen = QPen(QColor("#95A5A6"), 3)
+        pen.setCapStyle(Qt.RoundCap)
+        self.setPen(pen)
+        self.setZValue(-1)
+
+    def update_positions(self):
+        if self.source_port:
+            self.source_pos = self.source_port.center_scene_pos()
+        if self.target_port:
+            self.target_pos = self.target_port.center_scene_pos()
+        self.update_path()
+
+    
+    def set_positions(self, source: QPointF, target: QPointF):
+        self.source_pos = source
+        self.target_pos = target
+        self.update_path()
+
+    def set_target_pos(self, pos: QPointF):
+        self.target_pos = pos
+        self.update_path()
+
+    
+    def update_path(self):
+        path = QPainterPath()
+        path.moveTo(self.source_pos)
+        
+        dx = self.target_pos.x() - self.source_pos.x()
+        dy = self.target_pos.y() - self.source_pos.y()
+        
+        ctrl1_x = self.source_pos.x() + abs(dx) * 0.5
+        ctrl1_y = self.source_pos.y()
+        ctrl2_x = self.target_pos.x() - abs(dx) * 0.5
+        ctrl2_y = self.target_pos.y()
+        
+        path.cubicTo(
+            QPointF(ctrl1_x, ctrl1_y),
+            QPointF(ctrl2_x, ctrl2_y),
+            self.target_pos
+        )
+        
+        self.setPath(path)
