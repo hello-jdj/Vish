@@ -20,6 +20,8 @@ class NodePalette(QWidget):
         self.node_list = QListWidget()
         self.node_list.itemDoubleClicked.connect(self.on_node_selected)
         layout.addWidget(self.node_list)
+
+        self._node_chosen = False
         
         self.nodes = [
             ("Start", "start"),
@@ -61,3 +63,12 @@ class NodePalette(QWidget):
             self.close()
         else:
             super().keyPressEvent(event)
+
+    def closeEvent(self, event):
+        if not self._node_chosen:
+            view = self.parent()
+            if view:
+                scene = view.scene()
+                if scene and scene.drag_edge:
+                    scene._cancel_drag_edge()
+        super().closeEvent(event)

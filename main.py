@@ -11,6 +11,7 @@ from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode
 from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNode
 from ui.graph_view import GraphView
 from ui.palette import NodePalette
+from ui.property_panel import PropertyPanel
 
 class NodeFactory:
     @staticmethod
@@ -69,20 +70,27 @@ class VisualBashEditor(QMainWindow):
         
         toolbar.addStretch()
         main_layout.addLayout(toolbar)
-        
+
         splitter = QSplitter(Qt.Horizontal)
-        
+
         self.graph_view = GraphView(self.graph, self)
         splitter.addWidget(self.graph_view)
 
-        
+        self.property_panel = PropertyPanel()
+        splitter.addWidget(self.property_panel)
+
         self.output_text = QTextEdit()
         self.output_text.setReadOnly(True)
-        self.output_text.setMaximumWidth(400)
+        self.output_text.setMinimumWidth(300)
         splitter.addWidget(self.output_text)
-        
-        splitter.setSizes([1000, 400])
+
+        splitter.setSizes([900, 300, 400])
         main_layout.addWidget(splitter)
+
+        self.graph_view.graph_scene.node_selected.connect(
+            self.property_panel.set_node
+        )
+
     
     def create_initial_graph(self):
         start_node = StartNode()

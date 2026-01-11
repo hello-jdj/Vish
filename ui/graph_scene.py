@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import QGraphicsScene
 from PySide6.QtCore import Signal, QTimer
-from PySide6.QtGui import QCursor
+from PySide6.QtGui import QCursor, QPen, QColor
 from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
-from core.graph import Edge
+from core.port_types import PortDirection
 
 class GraphScene(QGraphicsScene):
     node_selected = Signal(object)
@@ -20,6 +20,18 @@ class GraphScene(QGraphicsScene):
         self.setBackgroundBrush(self.palette().dark())
 
     def start_connection(self, port_item):
+        if port_item.is_input:
+            for edge in list(self.edges):
+                if edge.target_port is port_item:
+                    if edge.edge:
+                        self.graph.remove_edge(edge.edge.id)
+                    if edge.scene() is self:
+                        self.removeItem(edge)
+                    self.edges.remove(edge)
+
+        if self.drag_edge and self.drag_edge.scene() is self:
+            self.removeItem(self.drag_edge)
+
         self.drag_edge = EdgeItem()
         self.drag_edge.source_port = port_item
         self.addItem(self.drag_edge)
@@ -27,7 +39,6 @@ class GraphScene(QGraphicsScene):
         pos = port_item.center_scene_pos()
         self.drag_edge.target_pos = pos
         self.drag_edge.update_positions()
-
 
     def end_connection(self, start_port_item):
         if not self.drag_edge:
@@ -48,31 +59,57 @@ class GraphScene(QGraphicsScene):
         else:
             self.pending_port = start_port_item
             self.pending_scene_pos = mouse_pos
-            self._cancel_drag_edge()
             self.views()[0].show_node_palette(mouse_pos)
 
     def finalize_connection(self, start_port, end_port):
+        if not self.drag_edge:
+            return
+
         if not self._is_valid_connection(start_port, end_port):
+            self._show_invalid_feedback(start_port, end_port)
             self._cancel_drag_edge()
             return
 
-        source = start_port if not start_port.is_input else end_port
-        target = end_port if source is start_port else start_port
+        a = start_port.port
+        b = end_port.port
+
+        if a.direction == PortDirection.OUTPUT:
+            source_item = start_port
+            target_item = end_port
+        else:
+            source_item = end_port
+            target_item = start_port
+
+        if target_item.is_input:
+            for edge in list(self.edges):
+                if edge.target_port is target_item:
+                    if edge.edge:
+                        self.graph.remove_edge(edge.edge.id)
+                    if edge.scene() is self:
+                        self.removeItem(edge)
+                    self.edges.remove(edge)
 
         edge_item = self.drag_edge
-        edge_item.source_port = source
-        edge_item.target_port = target
+        edge_item.source_port = source_item
+        edge_item.target_port = target_item
         edge_item.update_positions()
 
-        self.edges.append(edge_item)
         self.drag_edge = None
         self.start_port = None
+        self.pending_port = None
+        self.pending_scene_pos = None
 
-        def commit_core_edge():
-            core_edge = self.graph.add_edge(source.port, target.port)
+        def commit():
+            core_edge = self.graph.add_edge(source_item.port, target_item.port)
+            if not core_edge:
+                self._show_invalid_feedback(source_item, target_item)
+                if edge_item.scene() is self:
+                    self.removeItem(edge_item)
+                return
             edge_item.edge = core_edge
+            self.edges.append(edge_item)
 
-        QTimer.singleShot(0, commit_core_edge)
+        QTimer.singleShot(0, commit)
 
     def _is_valid_connection(self, a: PortItem, b: PortItem) -> bool:
         if a is b:
@@ -82,23 +119,63 @@ class GraphScene(QGraphicsScene):
         if a.is_input == b.is_input:
             return False
 
-        source = a if not a.is_input else b
-        target = b if source is a else a
+        if a.port.port_type != b.port.port_type:
+            return False
 
-        if source.port.port_type != target.port.port_type:
+        if a.port.direction == PortDirection.OUTPUT:
+            src = a.port
+            dst = b.port
+        else:
+            src = b.port
+            dst = a.port
+
+        if self._can_reach(dst.node, src.node):
             return False
 
         for edge in self.edges:
-            if edge.target_port is target:
+            if edge.target_port is (b if b.is_input else a):
                 return False
 
         return True
 
+    def _can_reach(self, start_node, target_node) -> bool:
+        visited = set()
+
+        def dfs(node):
+            if node.id in visited:
+                return False
+            visited.add(node.id)
+
+            if node is target_node:
+                return True
+
+            for edge in self.graph.edges.values():
+                if edge.source.node is node:
+                    if dfs(edge.target.node):
+                        return True
+            return False
+
+        return dfs(start_node)
+
     def _cancel_drag_edge(self):
         if self.drag_edge:
-            self.removeItem(self.drag_edge)
-            self.drag_edge = None
-            self.start_port = None
+            if self.drag_edge.scene() is self:
+                self.removeItem(self.drag_edge)
+        self.drag_edge = None
+        self.start_port = None
+
+    def _show_invalid_feedback(self, a, b):
+        edge = self.drag_edge
+        if not edge:
+            return
+
+        edge.setPen(QPen(QColor("#E74C3C"), 3))
+
+        def cleanup():
+            if edge.scene() is self:
+                self.removeItem(edge)
+
+        QTimer.singleShot(180, cleanup)
 
     def add_core_edge(self, core_edge, node_items):
         src_node_item = node_items[core_edge.source.node.id]
@@ -118,7 +195,7 @@ class GraphScene(QGraphicsScene):
 
     def update_edges_for_node(self, node_item):
         for port_item in node_item.port_items.values():
-            for edge in self.edges:
+            for edge in list(self.edges):
                 if edge.source_port == port_item or edge.target_port == port_item:
                     edge.update_positions()
 
