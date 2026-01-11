@@ -163,7 +163,6 @@ class GraphView(QGraphicsView):
 
         node_item = self.node_items[node_id]
 
-        # supprimer edges visuels
         for edge in list(self.graph_scene.edges):
             if (edge.source_port in node_item.port_items.values() or
                 edge.target_port in node_item.port_items.values()):

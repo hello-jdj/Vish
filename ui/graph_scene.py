@@ -69,8 +69,7 @@ class GraphScene(QGraphicsScene):
         self.start_port = None
 
         def commit_core_edge():
-            core_edge = Edge(source=source.port, target=target.port)
-            self.graph.edges.append(core_edge)
+            core_edge = self.graph.add_edge(source.port, target.port)
             edge_item.edge = core_edge
 
         QTimer.singleShot(0, commit_core_edge)
