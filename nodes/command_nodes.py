@@ -1,7 +1,9 @@
 from core.port_types import PortType
 from core.bash_emitter import BashContext
 from .base_node import BaseNode
+from nodes.registry import register_node
 
+@register_node("run_command")
 class RunCommandNode(BaseNode):
     def __init__(self):
         super().__init__("run_command", "Run Command", "#2ECC71")
@@ -21,24 +23,30 @@ class RunCommandNode(BaseNode):
         
         return command
 
+@register_node("echo")
 class EchoNode(BaseNode):
     def __init__(self):
         super().__init__("echo", "Echo", "#3498DB")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("Text", PortType.STRING)
+        self.add_input("Text", PortType.VARIABLE)
         self.add_output("Exec", PortType.EXEC)
         self.properties["text"] = "Hello"
-    
+        
     def emit_bash(self, context: BashContext) -> str:
         text = self.properties.get("text", "")
-        
+
         text_port = self.inputs[1]
+
         if text_port.connected_edges:
             source_node = text_port.connected_edges[0].source.node
-            text = source_node.properties.get("value", text)
-        
+
+            value = source_node.emit_bash_value(context)
+            if value is not None:
+                text = value
+
         return f'echo "{text}"'
 
+@register_node("exit")
 class ExitNode(BaseNode):
     def __init__(self):
         super().__init__("exit", "Exit", "#E74C3C")
