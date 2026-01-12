@@ -1,11 +1,13 @@
 from PySide6.QtWidgets import QGraphicsView
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPainter, QColor
 from core.graph import Port
 from ui.palette import NodePalette
 from .graph_scene import GraphScene
 from .node_item import NodeItem
 from .edge_item import EdgeItem
+from theme.theme import Theme
+
 
 class GraphView(QGraphicsView):
     connection_request = Signal(Port, Port)
@@ -21,9 +23,9 @@ class GraphView(QGraphicsView):
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
-
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setBackgroundBrush(QColor(Theme.BACKGROUND))
 
         self.node_items = {}
         self.edge_items = {}
