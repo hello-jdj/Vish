@@ -81,12 +81,44 @@ class NodePalette(QWidget):
     def focusOutEvent(self, event):
         self.close()
         super().focusOutEvent(event)
+    
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.tree.setFocus()
+        if not self.tree.currentItem():
+            self.tree.setCurrentItem(self.tree.topLevelItem(0))
+
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+        key = event.key()
+
+        if key in (Qt.Key_Return, Qt.Key_Enter):
+            item = self.tree.currentItem()
+            if not item:
+                return
+
+            if item.isExpanded():
+                item.setExpanded(False)
+                return
+            
+            if item.childCount() > 0:
+                item.setExpanded(True)
+                if item.childCount() > 0:
+                    self.tree.setCurrentItem(item.child(0))
+                return
+
+            node_type = item.data(0, Qt.UserRole)
+            if node_type:
+                self._node_chosen = True
+                self.node_selected.emit(node_type)
+                self.close()
+                return
+
+        if key == Qt.Key_Escape:
             self.close()
-        else:
-            super().keyPressEvent(event)
+            return
+
+        super().keyPressEvent(event)
 
     def closeEvent(self, event):
         if not self._node_chosen:
