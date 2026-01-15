@@ -12,7 +12,7 @@ class MathNode(BaseNode):
 @register_node("int_constant", category="Math", label="Integer Constant", description="Represents an integer constant value")
 class IntConstant(MathNode):
     def __init__(self):
-        super().__init__("int_const", "Int", "#BDC3C7")
+        super().__init__("int_constant", "Int", "#BDC3C7")
         self.add_output("Value", PortType.INT, "Integer value")
         self.properties["value"] = 0
 

@@ -3,7 +3,7 @@ from typing import Dict, Any
 from .graph import Graph, Node, Port
 
 class Serializer:
-    VERSION = "1.0.0"
+    VERSION = "0.0.0.beta"
     
     @staticmethod
     def serialize(graph: Graph) -> str:
@@ -40,25 +40,31 @@ class Serializer:
     def deserialize(json_str: str, node_factory) -> Graph:
         data = json.loads(json_str)
         graph = Graph()
-        
         port_map = {}
-        
+
         for node_data in data["nodes"]:
             node = node_factory.create_node(node_data["type"])
+            if node is None:
+                raise ValueError(f"Unknown node type: {node_data['type']}")
+            
             node.id = node_data["id"]
             node.title = node_data["title"]
             node.x = node_data["x"]
             node.y = node_data["y"]
             node.properties = node_data.get("properties", {})
             graph.add_node(node)
-            
-            for port in node.inputs + node.outputs:
+
+            for saved, port in zip(node_data.get("inputs", []), node.inputs):
+                port.id = saved["id"]
                 port_map[port.id] = port
-        
+
+            for saved, port in zip(node_data.get("outputs", []), node.outputs):
+                port.id = saved["id"]
+                port_map[port.id] = port
+
         for edge_data in data["edges"]:
             source = port_map.get(edge_data["source"])
             target = port_map.get(edge_data["target"])
             if source and target:
                 graph.add_edge(source, target)
-        
         return graph
