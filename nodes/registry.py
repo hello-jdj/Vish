@@ -1,7 +1,5 @@
 NODE_REGISTRY = {}
 
-# TODO: Add description to every node
-
 def register_node(node_type: str, *, label=None, category="Other", description=""):
     def decorator(cls):
         NODE_REGISTRY[node_type] = {

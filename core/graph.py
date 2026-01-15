@@ -113,6 +113,8 @@ class Graph:
         ordered = []
         start = None
         for node in self.nodes.values():
+            print(node.title)
+        for node in self.nodes.values():
             if node.node_type == "start":
                 start = node
                 break

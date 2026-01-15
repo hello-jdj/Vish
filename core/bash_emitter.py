@@ -1,55 +1,28 @@
-from typing import List, Dict, Any
-from .graph import Graph, Node, Port
-
-class BashContext:
-    def __init__(self):
-        self.variables: Dict[str, str] = {}
-        self.indent_level = 0
-        self.lines: List[str] = []
-        self.function_lines = []
-        self.emitted_nodes = set()
-    
-    def add_line(self, line: str):
-        indent = "    " * self.indent_level
-        self.lines.append(f"{indent}{line}")
-
-    def add_function_line(self, line: str):
-        self.function_lines.append(line)
-
-    def build(self) -> str:
-        return "\n".join(self.function_lines + [""] + self.lines)
-    
-    def indent(self):
-        self.indent_level += 1
-    
-    def dedent(self):
-        self.indent_level = max(0, self.indent_level - 1)
-    
-    def get_script(self) -> str:
-        return "\n".join(self.lines)
+from core.graph import Graph
+from nodes.base_node import BaseNode
+from core.bash_context import BashContext
 
 class BashEmitter:
     def __init__(self, graph: Graph):
         self.graph = graph
-    
+
     def emit(self) -> str:
         context = BashContext()
-        context.add_line("#!/bin/bash")
-        context.add_line("")
-        context.add_line("# Generated from Visual Bash Editor (Vish)")
-        context.add_line("")
-        
-        execution_order = self.graph.get_execution_order()
-        
-        for node in execution_order:
-            if node.node_type == "start":
-                continue
 
-            if node.id in context.emitted_nodes:
-                continue
-
-            context.emitted_nodes.add(node.id)
-            bash_code = node.emit_bash(context)
-            if bash_code:
-                context.add_line(bash_code)
-        return context.get_script()
+        header = [
+            "#!/bin/bash",
+            "",
+            "# Generated from Visual Bash Editor (Vish)",
+            ""
+        ]
+        for node in self.graph.nodes.values():
+            if node.node_type == "function":
+                if node.id in context.emitted_nodes:
+                    continue
+                context.emitted_nodes.add(node.id)
+                node.emit_bash(context)
+        start_node = self.graph.get_start_node()
+        if start_node and start_node.outputs and start_node.outputs[0].connected_edges:
+            first = start_node.outputs[0].connected_edges[0].target.node
+            BaseNode.emit_exec_chain(first, context)
+        return "\n".join(header) + context.get_script()

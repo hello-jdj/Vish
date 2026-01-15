@@ -1,5 +1,5 @@
 from core.port_types import PortType
-from core.bash_emitter import BashContext
+from core.bash_context import BashContext
 from nodes.registry import register_node
 from .base_node import BaseNode
 

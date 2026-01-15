@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from core.graph import Node, PortType
-from core.bash_emitter import BashContext
+from core.bash_context import BashContext
 
 class BaseNode(Node):
     def __init__(self, node_type: str, title: str, color: str):

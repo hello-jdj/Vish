@@ -1,6 +1,6 @@
 from nodes.base_node import BaseNode
 from core.port_types import PortType
-from core.bash_emitter import BashContext
+from core.bash_context import BashContext
 from nodes.registry import register_node
 
 class MathNode(BaseNode):
