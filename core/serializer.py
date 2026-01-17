@@ -6,11 +6,12 @@ class Serializer:
     VERSION = "0.0.0.beta"
     
     @staticmethod
-    def serialize(graph: Graph) -> str:
+    def serialize(graph: Graph, graph_view) -> str:
         data = {
             "version": Serializer.VERSION,
             "nodes": [],
-            "edges": []
+            "edges": [],
+            "comments": []
         }
         
         for node in graph.nodes.values():
@@ -33,6 +34,20 @@ class Serializer:
                 "target": edge.target.id
             }
             data["edges"].append(edge_data)
+
+        for item in graph_view.graph_scene.items():
+            if item.__class__.__name__ == "CommentBoxItem":
+                r = item.rect()
+                c = item.brush().color()
+                data["comments"].append({
+                    "x": item.pos().x(),
+                    "y": item.pos().y(),
+                    "w": r.width(),
+                    "h": r.height(),
+                    "title": item.title_item.toPlainText(),
+                    "color": [c.red(), c.green(), c.blue(), c.alpha()],
+                    "locked": item.locked
+                })
         
         return json.dumps(data, indent=2)
     
@@ -67,4 +82,4 @@ class Serializer:
             target = port_map.get(edge_data["target"])
             if source and target:
                 graph.add_edge(source, target)
-        return graph
+        return graph, data.get("comments", [])
