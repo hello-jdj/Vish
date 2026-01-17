@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem
+from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem, QMenu
 from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QPen, QColor
 
@@ -19,6 +19,7 @@ class CommentBoxItem(QGraphicsRectItem):
         self.resize_margin = 10
         self.resizing = False
         self.resize_corner = None
+        self.locked = False
 
         pen = QPen(QColor(220, 220, 220))
         pen.setWidth(2)
@@ -30,6 +31,7 @@ class CommentBoxItem(QGraphicsRectItem):
 
         self.title_item.setTextInteractionFlags(Qt.TextEditorInteraction)
         self.title_item.setFlag(QGraphicsTextItem.ItemIsFocusable)
+        self.title_item.setAcceptedMouseButtons(Qt.LeftButton)
 
         self.title_padding = 8
         self._update_title_position()
@@ -58,6 +60,34 @@ class CommentBoxItem(QGraphicsRectItem):
         if QRectF(r.bottomRight() - QPointF(m, m), QSizeF(m, m)).contains(pos):
             return "br"
         return None
+    
+    def set_locked(self, locked: bool):
+        self.locked = locked
+
+        self.setFlag(QGraphicsRectItem.ItemIsMovable, not locked)
+        self.setAcceptHoverEvents(not locked)
+        self.setCursor(Qt.ArrowCursor if locked else Qt.OpenHandCursor)
+
+        if locked:
+            self.setBrush(QColor(255, 255, 255, 20))
+            self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
+        else:
+            self.setBrush(QColor(255, 255, 255, 40))
+            self.title_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+
+        self.update()
+
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+
+        lock_action = menu.addAction("Unlock" if self.locked else "Lock")
+
+        action = menu.exec(event.screenPos())
+        if action == lock_action:
+            self.set_locked(not self.locked)
+        event.accept()
+
+
 
     def hoverMoveEvent(self, event):
         corner = self._get_resize_corner(event.pos())
@@ -78,31 +108,55 @@ class CommentBoxItem(QGraphicsRectItem):
         super().hoverMoveEvent(event)
 
     def mousePressEvent(self, event):
+        if self.locked:
+            super().mousePressEvent(event)
+            return
         if self.title_item.isUnderMouse():
             event.ignore()
             return
+
         self.resize_corner = self._get_resize_corner(event.pos())
         self.resizing = self.resize_corner is not None
         self.drag_start_pos = event.pos()
         self.original_rect = QRectF(self.rect())
+        self.original_item_pos = self.pos()
         super().mousePressEvent(event)
+
 
     def mouseMoveEvent(self, event):
         if not self.resizing:
             super().mouseMoveEvent(event)
             return
 
+        min_w, min_h = 120, 60
         delta = event.pos() - self.drag_start_pos
-        r = QRectF(self.original_rect)
+
+        orig = self.original_rect
+        orig_pos = self.original_item_pos
 
         if self.resize_corner == "br":
-            r.setBottomRight(r.bottomRight() + delta)
-        elif self.resize_corner == "bl":
-            r.setBottomLeft(r.bottomLeft() + delta)
+            w = max(min_w, orig.width() + delta.x())
+            h = max(min_h, orig.height() + delta.y())
+            self.setRect(QRectF(0, 0, w, h))
+
         elif self.resize_corner == "tr":
-            r.setTopRight(r.topRight() + delta)
+            w = max(min_w, orig.width() + delta.x())
+            h = max(min_h, orig.height() - delta.y())
+            self.setPos(orig_pos.x(), orig_pos.y() + (orig.height() - h))
+            self.setRect(QRectF(0, 0, w, h))
+
+        elif self.resize_corner == "bl":
+            w = max(min_w, orig.width() - delta.x())
+            h = max(min_h, orig.height() + delta.y())
+            self.setPos(orig_pos.x() + (orig.width() - w), orig_pos.y())
+            self.setRect(QRectF(0, 0, w, h))
+
         elif self.resize_corner == "tl":
-            r.setTopLeft(r.topLeft() + delta)
+            w = max(min_w, orig.width() - delta.x())
+            h = max(min_h, orig.height() - delta.y())
+            self.setPos(orig_pos.x() + (orig.width() - w), orig_pos.y() + (orig.height() - h))
+            self.setRect(QRectF(0, 0, w, h))
+
 
         self.setRect(r.normalized())
         self._update_title_position()
