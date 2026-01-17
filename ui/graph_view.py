@@ -203,3 +203,8 @@ class GraphView(QGraphicsView):
 
         self.graph_scene.removeItem(node_item)
         del self.node_items[node_id]
+    
+    def apply_theme(self):
+        self.setBackgroundBrush(QColor(Theme.BACKGROUND))
+        self.viewport().update()
+
