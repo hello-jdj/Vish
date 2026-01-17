@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem
+from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem
 from PySide6.QtCore import Qt, Signal, QRectF, QPointF
 from PySide6.QtGui import QPainter, QColor, QCursor
 from core.graph import Port
@@ -157,6 +157,10 @@ class GraphView(QGraphicsView):
         super().mouseReleaseEvent(event)
 
     def keyPressEvent(self, event):
+        focus_item = self.scene().focusItem()
+        if isinstance(focus_item, QGraphicsTextItem):
+            super().keyPressEvent(event)
+            return
         if event.key() == Qt.Key_C:
             self.create_comment_box()
             event.accept()
