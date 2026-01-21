@@ -18,6 +18,7 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 ## Credits
 - Developed by Lluciocc
 - Inspired by Unreal Engine's Blueprint system
+- Every icon are from [Pictogrammers](https://pictogrammers.com/library/mdi/)
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
