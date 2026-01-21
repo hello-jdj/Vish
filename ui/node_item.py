@@ -1,8 +1,12 @@
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsTextItem
+from unicodedata import category
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsSvgItem
 from PySide6.QtCore import QRectF, Qt, QPointF
-from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPainterPath
+from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPainterPath, QIcon, QPixmap
 from core.graph import Node
-from .port_item import PortItem
+from theme.theme import Theme
+from ui.port_item import PortItem
+from nodes.registry import NODE_REGISTRY
+import os
 
 class NodeItem(QGraphicsItem):
     WIDTH = 180
@@ -14,8 +18,8 @@ class NodeItem(QGraphicsItem):
         super().__init__()
         self.node = node
         self.port_items = {}
-        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        
+        self.icon_item = None
+
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
@@ -24,6 +28,7 @@ class NodeItem(QGraphicsItem):
         self.title_item.setDefaultTextColor(QColor("#ECF0F1"))
         self.title_item.setPos(10, 8)
         
+        self.setup_icon()
         self.setup_ports()
         
         self.height = self.HEADER_HEIGHT + max(
@@ -89,3 +94,59 @@ class NodeItem(QGraphicsItem):
         if scene:
             scene.node_selected.emit(self.node)
         super().mousePressEvent(event)
+
+    def get_icon_node(self, item: Node):
+        node = NODE_REGISTRY.get(item.title.lower())
+        if node is not None:
+            category = node["category"]
+            path = "assets/icons/nodes/{}/{}.png".format(
+                    category.lower().replace(" ", "_"),
+                    item.title.lower().replace(" ", "_")
+                )
+            if os.path.exists(path):
+                return QIcon(path)
+            else:
+                return QIcon("assets/icons/nodes/{}/default.png".format(category))
+            
+    def setup_icon(self):
+        icon = self.get_icon_node(self.node)
+        padding = 8
+        spacing = 6
+        icon_size = 18
+        x = padding
+
+        if icon and not icon.isNull():
+            pixmap = icon.pixmap(
+                icon_size,
+                icon_size,
+                QIcon.Normal,
+                QIcon.On
+            )
+            self.icon_item = QGraphicsPixmapItem(pixmap, self)
+            self.icon_item.setTransformationMode(Qt.SmoothTransformation)
+            icon_y = (self.HEADER_HEIGHT - icon_size) / 2
+            self.icon_item.setPos(x, icon_y)
+            x += icon_size + spacing
+
+        text_rect = self.title_item.boundingRect()
+        text_y = (self.HEADER_HEIGHT - text_rect.height()) / 2
+        self.title_item.setPos(x, text_y)
+
+    # def setup_icon(self):
+    #     svg_path = self.get_icon_node(self.node)
+    #     padding = 8
+    #     spacing = 6
+    #     icon_size = 18
+    #     x = padding
+
+    #     if svg_path:
+    #         self.icon_item = QGraphicsSvgItem(svg_path, self)
+    #         bounds = self.icon_item.boundingRect()
+    #         scale = icon_size / max(bounds.width(), bounds.height())
+    #         self.icon_item.setScale(scale)
+    #         icon_y = (self.HEADER_HEIGHT - bounds.height() * scale) / 2
+    #         self.icon_item.setPos(x, icon_y)
+    #         x += icon_size + spacing
+    #     text_rect = self.title_item.boundingRect()
+    #     text_y = (self.HEADER_HEIGHT - text_rect.height()) / 2
+    #     self.title_item.setPos(x, text_y)
