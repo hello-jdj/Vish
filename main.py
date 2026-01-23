@@ -172,7 +172,10 @@ class VisualBashEditor(QMainWindow):
             box.setBrush(QColor(*c["color"]))
             box.set_locked(c.get("locked", False))
             self.graph_view.scene().addItem(box)
-                
+
+        self.graph_view.graph_scene.node_selected.connect(
+            self.property_panel.set_node
+        )
         splitter.setSizes([900, 300, 400])
 
         Debug.Log(f"Graph loaded from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
