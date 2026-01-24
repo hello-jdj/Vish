@@ -1,6 +1,8 @@
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from core.bash_context import BashContext
 from uuid import uuid4
-from .port_types import PortType, PortDirection
+from core.port_types import PortType, PortDirection
 
 class Port:
     def __init__(self, name: str, port_type: PortType, direction: PortDirection, node: 'Node', tooltip=""):
