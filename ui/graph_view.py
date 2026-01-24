@@ -191,6 +191,7 @@ class GraphView(QGraphicsView):
             return
 
         node_item = self.node_items[node_id]
+        self.graph.remove_node(node_id)
 
         for edge in list(self.graph_scene.edges):
             if (edge.source_port in node_item.port_items.values() or
