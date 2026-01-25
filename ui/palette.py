@@ -27,6 +27,8 @@ class NodePalette(QWidget):
         self.tree = QTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.itemDoubleClicked.connect(self.on_item_activated)
+        self.tree.setMouseTracking(True)
+        self.tree.viewport().setMouseTracking(True)
         layout.addWidget(self.tree)
 
         self._node_chosen = False
@@ -40,7 +42,7 @@ class NodePalette(QWidget):
         for node_type, meta in NODE_REGISTRY.items():
             cat = meta["category"]
             categories.setdefault(cat, []).append(
-                (meta["label"], node_type)
+                (meta["label"], node_type, meta.get("description", ""))
             )
 
         for category in sorted(categories.keys()):
@@ -51,10 +53,10 @@ class NodePalette(QWidget):
             if ico:
                 cat_item.setIcon(0, ico)
 
-            for label, node_type in sorted(categories[category]):
+            for label, node_type, description in sorted(categories[category]):
                 item = QTreeWidgetItem([label])
                 item.setData(0, Qt.UserRole, node_type)
-                item.setToolTip(0, meta["description"])
+                item.setToolTip(0, description)
                 cat_item.addChild(item)
 
             self.tree.addTopLevelItem(cat_item)
