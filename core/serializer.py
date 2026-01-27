@@ -4,6 +4,10 @@ from .graph import Graph, Node, Port
 
 class Serializer:
     VERSION = "0.0.0.beta"
+
+    def __init__(self, graph: Graph):
+        self.graph = graph
+        
     
     @staticmethod
     def serialize(graph: Graph, graph_view) -> str:
@@ -83,3 +87,38 @@ class Serializer:
             if source and target:
                 graph.add_edge(source, target)
         return graph, data.get("comments", [])
+
+    def serialize_node(self, node):
+        return {
+            "id": node.id,
+            "type": node.node_type,
+            "x": node.x,
+            "y": node.y,
+            "properties": dict(node.properties),
+            "inputs": [p.id for p in node.inputs],
+            "outputs": [p.id for p in node.outputs],
+        }
+
+    def serialize_edge(self, edge):
+        return {
+            "source_node": edge.source.node.id,
+            "source_port": edge.source.id,
+            "target_node": edge.target.node.id,
+            "target_port": edge.target.id,
+        }
+
+    def serialize_subgraph(self, nodes):
+        node_ids = {n.id for n in nodes}
+        data = {"nodes": [], "edges": []}
+
+        for node in nodes:
+            data["nodes"].append(self.serialize_node(node))
+
+        for edge in self.graph.edges.values():
+            if (
+                edge.source.node.id in node_ids
+                and edge.target.node.id in node_ids
+            ):
+                data["edges"].append(self.serialize_edge(edge))
+
+        return data

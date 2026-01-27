@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem
 from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent
-from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent
+from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence
 from core.graph import Port
 from ui.palette import NodePalette
 from ui.graph_scene import GraphScene
@@ -8,6 +8,9 @@ from ui.node_item import NodeItem
 from ui.edge_item import EdgeItem
 from ui.comment_box import CommentBoxItem
 from theme.theme import Theme
+from core.clipboard import GraphClipboard
+from core.serializer import Serializer
+from nodes.registry import create_node
 
 
 class GraphView(QGraphicsView):
@@ -32,6 +35,10 @@ class GraphView(QGraphicsView):
         self.edge_items = {}
         self.scale_factor = 1.0
         self._palette = None
+        self.clipboard = GraphClipboard()
+        self.serializer = Serializer(self.graph)
+        self.node_factory = create_node
+        self.paste_offset = (30, 30)
 
     def contextMenuEvent(self, event):
         scene_pos = self.mapToScene(event.pos())
@@ -166,6 +173,13 @@ class GraphView(QGraphicsView):
         if isinstance(focus_item, QGraphicsTextItem):
             super().keyPressEvent(event)
             return
+        if event.matches(QKeySequence.Copy):
+            self.copy_selection()
+            return
+
+        if event.matches(QKeySequence.Paste):
+            self.paste()
+            return
         if event.key() == Qt.Key_C:
             self.create_comment_box()
             event.accept()
@@ -209,6 +223,72 @@ class GraphView(QGraphicsView):
 
         self.graph_scene.removeItem(node_item)
         del self.node_items[node_id]
+
+    def get_selected_node_items(self):
+        return [
+            item for item in self.graph_scene.selectedItems()
+            if hasattr(item, "node")
+        ]
+
+    def get_selected_nodes(self):
+        return [item.node for item in self.get_selected_node_items()]
+    
+    def copy_selection(self):
+        nodes = self.get_selected_nodes()
+        if not nodes:
+            return
+        
+        print("Copying nodes:", len(nodes))
+
+        data = self.serializer.serialize_subgraph(nodes)
+        self.clipboard.set(data)
+
+    def paste(self):
+        if not self.clipboard.has_data():
+            return
+
+        data = self.clipboard.get()
+        id_map = {}
+
+        for node_data in data["nodes"]:
+            node = self.node_factory(node_data["type"])
+            node.properties.update(node_data["properties"])
+            node.x = node_data["x"] + self.paste_offset[0]
+            node.y = node_data["y"] + self.paste_offset[1]
+
+            self.graph.add_node(node)
+            self.add_node_item(node)
+
+            id_map[node_data["id"]] = node
+
+        for edge_data in data["edges"]:
+            src_node = id_map.get(edge_data["source_node"])
+            tgt_node = id_map.get(edge_data["target_node"])
+            if not src_node or not tgt_node:
+                continue
+
+            src_port = None
+            tgt_port = None
+
+            for p in src_node.outputs:
+                if p.id == edge_data["source_port"]:
+                    src_port = p
+                    break
+
+            for p in tgt_node.inputs:
+                if p.id == edge_data["target_port"]:
+                    tgt_port = p
+                    break
+
+            if not src_port or not tgt_port:
+                continue
+
+            edge = self.graph.add_edge(src_port, tgt_port)
+            if edge:
+                self.add_edge_item(edge)
+
+
+
     
     def apply_theme(self):
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))
