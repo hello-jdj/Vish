@@ -1,4 +1,5 @@
 import os
+import pty
 import sys
 import subprocess
 import time
@@ -23,6 +24,7 @@ from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
+from core.config import Config
 
 class NodeFactory:
     @staticmethod
@@ -101,6 +103,9 @@ class VisualBashEditor(QMainWindow):
         self.run_output_text.setReadOnly(True)
         self.run_output_text.setVisible(False)
         self.run_output_text.setMinimumHeight(150)
+        self.run_output_text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.run_output_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.run_output_text.setLineWrapMode(QTextEdit.NoWrap)
 
         self.output_splitter.addWidget(self.output_text)
         self.output_splitter.addWidget(self.run_output_text)
@@ -208,7 +213,61 @@ class VisualBashEditor(QMainWindow):
             set_white_theme()
 
         self.graph_view.apply_theme()
+    
+    def run_pty(self, script_path: str) -> str:
+        master_fd, slave_fd = pty.openpty()
 
+        proc = subprocess.Popen(
+            ["bash", "-i", script_path],
+            stdin=slave_fd,
+            stdout=slave_fd,
+            stderr=slave_fd,
+            close_fds=True,
+            text=False,
+        )
+
+        os.close(slave_fd)
+
+        output = b""
+        while True:
+            try:
+                chunk = os.read(master_fd, 1024)
+                if not chunk:
+                    break
+                output += chunk
+            except OSError:
+                break
+
+        proc.wait()
+        os.close(master_fd)
+
+        output = output.decode(errors="replace")
+
+        filtered = []
+        for line in output.splitlines(): # NOTE: i have to filter some lines because bash -i outputs them
+            if (
+                "cannot set terminal process group" in line
+                or "no job control in this shell" in line
+            ):
+                continue
+            filtered.append(line)
+
+        return "\n".join(filtered)
+
+
+    def run_no_pty(self, script_path: str) -> str:
+        result = subprocess.run(
+            ["bash", script_path],
+            capture_output=True,
+            text=True
+        )
+        output = result.stdout
+        error = result.stderr
+
+        if error:
+            return f"\x1b[1;31mError:\x1b[0m\n{error}"
+        return output
+    
     def run_bash(self):
         self.set_run_output_visible(True)
         bash_script = self.output_text.toPlainText()
@@ -226,22 +285,15 @@ class VisualBashEditor(QMainWindow):
         Debug.Log(f"Running generated bash script...")
 
         try:
-            result = subprocess.run(
-                ["bash", temp_script_path],
-                capture_output=True,
-                text=True
-            )
-            output = result.stdout
-            error = result.stderr
+            if Config.USING_TTY:
+                output = self.run_pty(temp_script_path)
+            else:
+                output = self.run_no_pty(temp_script_path)
 
             self.run_output_text.setVisible(True)
             self.output_splitter.setSizes([200, 150])
 
-            if error:
-                ansi = f"\x1b[1;31mError:\x1b[0m\n{error}"
-                self.run_output_text.setHtml(ansi_to_html(ansi))
-            else:
-                self.run_output_text.setHtml(ansi_to_html(output))
+            self.run_output_text.setHtml(ansi_to_html(output))
 
         except Exception as e:
             self.run_output_text.setVisible(True)

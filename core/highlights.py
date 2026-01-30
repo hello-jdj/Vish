@@ -62,7 +62,14 @@ class BashHighlighter(QSyntaxHighlighter):
             "ifconfig", "netstat", "ssh-keygen",
             "alias", "unalias", "export", "source",
             "history", "clear", "man", "help", "which",
-            "env", "printenv", "date", "time", "uptime"
+            "env", "printenv", "date", "time", "uptime", 
+            "df", "du", "mount", "umount", "service", "set",
+            "unset", "jobs", "fg", "bg", "wait", "trap", "test", 
+            "expr", "bc", "cut", "sort", "uniq", "wc", "tee", "diff",
+            "cmp", "stat", "file", "basename", "dirname", "readlink",
+            "ln", "sleep", "shift", "getopts", "printf", "let", "eval",
+            "exec", "disown", "shopt", "complete", "compgen", "mapfile", 
+
         ]
         for cmd in commands:
             self.rules.append((
