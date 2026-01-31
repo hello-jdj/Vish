@@ -14,6 +14,7 @@ from core.serializer import Serializer
 from nodes.registry import create_node
 from core.debug import Debug
 from commands.undo_commands import *
+from core.layout import GraphLayoutEngine
 
 class ZoomLabel(QLabel):
     def mouseDoubleClickEvent(self, event):
@@ -370,42 +371,20 @@ class GraphView(QGraphicsView):
         self.paste_offset = (self.paste_offset[0] + 10, self.paste_offset[1] + 10)
         Debug.Log(f"Pasted {len(nodes_data)} nodes")
 
-    def auto_layout(self, start_nodes=None, x_spacing=260, y_spacing=140):
-        if start_nodes is None:
-            start_nodes = [
-                n for n in self.graph.nodes.values()
-                if any(p.port_type == PortType.EXEC for p in n.outputs)
-            ]
+    def auto_layout(self):
+        l = GraphLayoutEngine(self.graph)
+        positions = l.compute()
 
-        visited = set()
-        levels = {}
-
-        def walk(node, depth):
-            if node.id in visited:
-                return
-            visited.add(node.id)
-
-            levels.setdefault(depth, []).append(node)
-
-            for out in node.outputs:
-                if out.port_type != PortType.EXEC:
-                    continue
-                for edge in out.connected_edges:
-                    walk(edge.target.node, depth + 1)
-
-        for n in start_nodes:
-            walk(n, 0)
-
-        for depth, nodes in levels.items():
-            for i, node in enumerate(nodes):
-                x = depth * x_spacing
-                y = i * y_spacing
-                node.x = x
-                node.y = y
-                item = self.node_items.get(node.id)
-                if item:
-                    item.setPos(x, y)
-                    self.graph_scene.update_edges_for_node(item)
+        for node_id, (x, y) in positions.items():
+            node = self.graph.nodes.get(node_id)
+            if not node:
+                continue
+            node.x = x
+            node.y = y
+            item = self.node_items.get(node_id)
+            if item:
+                item.setPos(x, y)
+                self.graph_scene.update_edges_for_node(item)
 
 
     def apply_theme(self):
