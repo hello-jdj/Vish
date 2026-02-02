@@ -1,5 +1,5 @@
+import platform
 from ui.info import MessageWidget
-
 
 class Debug:
     _parent = None
@@ -28,3 +28,11 @@ class Debug:
     @staticmethod
     def Log(message: str):
         Debug._show(message, "info")
+
+class Info:
+    @staticmethod
+    def get_os():
+        return platform.system()
+
+
+
