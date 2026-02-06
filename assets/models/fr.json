@@ -10,6 +10,17 @@
     "add_node":"Ajouter un noeud",
     "search_nodes": "Rechercher...",
     "lang_set": "La langue a été mise à jour vers {lang}",
+    "btn_generate_bash": "Générer le script Bash",
+    "btn_save": "Sauvegarder",
+    "btn_load": "Charger",
+    "btn_run_bash": "Exécuter le script Bash",
+    "btn_copy_clipboard": "Copier dans le presse-papiers",
+    "theme_dark": "Sombre",
+    "theme_purple": "Violet",
+    "theme_white": "Clair",
+    "lang_en": "Anglais",
+    "lang_fr": "Français",
+    "lang_es": "Espagnol",
 
 
     "Commands": "Commandes",

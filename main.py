@@ -58,29 +58,37 @@ class VisualBashEditor(QMainWindow):
         
         toolbar = QHBoxLayout()
         
-        generate_btn = QPushButton("Generate Bash")
-        generate_btn.clicked.connect(self.generate_bash)
-        toolbar.addWidget(generate_btn)
+        self.generate_btn = QPushButton("Generate Bash")
+        self.generate_btn.clicked.connect(self.generate_bash)
+        toolbar.addWidget(self.generate_btn)
         
-        save_btn = QPushButton("Save")
-        save_btn.clicked.connect(self.save_graph)
-        toolbar.addWidget(save_btn)
+        self.save_btn = QPushButton("Save")
+        self.save_btn.clicked.connect(self.save_graph)
+        toolbar.addWidget(self.save_btn)
         
-        load_btn = QPushButton("Load")
-        load_btn.clicked.connect(self.load_graph)
-        toolbar.addWidget(load_btn)
+        self.load_btn = QPushButton("Load")
+        self.load_btn.clicked.connect(self.load_graph)
+        toolbar.addWidget(self.load_btn)
 
-        set_theme_btn = QComboBox()
-        set_theme_btn.addItems(["Dark", "Purple", "White"])
-        set_theme_btn.currentTextChanged.connect(self.set_theme)
-        set_theme_btn.setFixedHeight(generate_btn.sizeHint().height())
-        toolbar.addWidget(set_theme_btn)
+        self.set_theme_btn = QComboBox()
+        self.set_theme_btn.addItem(Traduction.get_trad("theme_dark", "Dark"), "dark")
+        self.set_theme_btn.addItem(Traduction.get_trad("theme_purple", "Purple"), "purple")
+        self.set_theme_btn.addItem(Traduction.get_trad("theme_white", "White"), "white")
+        self.set_theme_btn.currentIndexChanged.connect(
+            lambda _: self.set_theme(self.set_theme_btn.currentData())
+        )
+        self.set_theme_btn.setFixedHeight(self.generate_btn.sizeHint().height())
+        toolbar.addWidget(self.set_theme_btn)
 
-        set_lang_btn = QComboBox()
-        set_lang_btn.addItems(["en", "fr", "es"])
-        set_lang_btn.currentTextChanged.connect(self.set_lang)
-        set_lang_btn.setFixedHeight(generate_btn.sizeHint().height())
-        toolbar.addWidget(set_lang_btn)
+        self.set_lang_btn = QComboBox()
+        self.set_lang_btn.addItem(Traduction.get_trad("lang_en", "English"), "en")
+        self.set_lang_btn.addItem(Traduction.get_trad("lang_fr", "French"), "fr")
+        self.set_lang_btn.addItem(Traduction.get_trad("lang_es", "Spanish"), "es")
+        self.set_lang_btn.currentIndexChanged.connect(
+            lambda _: self.set_lang(self.set_lang_btn.currentData())
+        )
+        self.set_lang_btn.setFixedHeight(self.generate_btn.sizeHint().height())
+        toolbar.addWidget(self.set_lang_btn)
 
         toolbar.addStretch()
         main_layout.addLayout(toolbar)
@@ -212,19 +220,20 @@ class VisualBashEditor(QMainWindow):
         Debug.Log(Traduction.get_trad("graph_loaded_successfully", f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
     
     def set_theme(self, theme_name: str):
-        if theme_name == "Dark":
+        if theme_name == "dark":
             set_dark_theme()
-        elif theme_name == "Purple":
+        elif theme_name == "purple":
             set_purple_theme()
-        elif theme_name == "White":
+        elif theme_name == "white":
             set_white_theme()
 
         self.graph_view.apply_theme()
     
     def set_lang(self, lang:str):
         Traduction.set_translate_model(lang)
+        self.refresh_ui_texts()
         Debug.Log(Traduction.get_trad("lang_set", f"Language set to {lang}", lang=lang))
-    
+        
     def run_pty(self, script_path: str) -> str:
         master_fd, slave_fd = pty.openpty()
 
@@ -327,6 +336,22 @@ class VisualBashEditor(QMainWindow):
             self.output_splitter.setSizes([1, 0])
         else:
             self.output_splitter.setSizes([200, 150])
+
+    def refresh_ui_texts(self):
+        self.generate_btn.setText(Traduction.get_trad("btn_generate_bash", "Generate Bash"))
+        self.save_btn.setText(Traduction.get_trad("btn_save", "Save"))
+        self.load_btn.setText(Traduction.get_trad("btn_load", "Load"))
+        self.run_bash_btn.setText(Traduction.get_trad("btn_run_bash", "Run Bash Script"))
+        self.copy_btn.setText(Traduction.get_trad("btn_copy_clipboard", "Copy to Clipboard"))
+
+        self.set_theme_btn.setItemText(0, Traduction.get_trad("theme_dark", "Dark"))
+        self.set_theme_btn.setItemText(1, Traduction.get_trad("theme_purple", "Purple"))
+        self.set_theme_btn.setItemText(2, Traduction.get_trad("theme_white", "White"))
+
+        self.set_lang_btn.setItemText(0, Traduction.get_trad("lang_en", "English"))
+        self.set_lang_btn.setItemText(1, Traduction.get_trad("lang_fr", "French"))
+        self.set_lang_btn.setItemText(2, Traduction.get_trad("lang_es", "Spanish"))
+
 
 def main():
     app = QApplication(sys.argv)
