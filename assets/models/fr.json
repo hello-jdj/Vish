@@ -9,6 +9,8 @@
     "running_generated_bash_script": "Exécution du script bash généré...",
     "add_node":"Ajouter un noeud",
     "search_nodes": "Rechercher...",
+    "lang_set": "La langue a été mise à jour vers {lang}",
+
 
     "Commands": "Commandes",
     "Flow": "Flux",
