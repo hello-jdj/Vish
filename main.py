@@ -26,6 +26,7 @@ from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
 from core.config import Config
 from core.debug import Info
+from core.traduction import Traduction
 
 class NodeFactory:
     @staticmethod
@@ -322,6 +323,7 @@ def main():
     app = QApplication(sys.argv)
     editor = VisualBashEditor()
     Debug.init(editor)
+    Traduction.set_translate_model("en")
     editor.show()
     sys.exit(app.exec())
 
