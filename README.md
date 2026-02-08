@@ -48,6 +48,8 @@ An other way to contribute Vish is to help translating it in other languages. If
 - Inspired by Unreal Engine's Blueprint system
 - Every icon are from [Pictogrammers](https://pictogrammers.com/library/mdi/)
 - ANSI to HTML conversion code inspired from [ansi-to-html](https://github.com/pycontribs/ansi2html)
+- Some style inspired from TheGnomeProject's Adwaita theme
+- Thanks to the PySide6 documentation [https://doc.qt.io/qtforpython/](https://doc.qt.io/qtforpython/)
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details

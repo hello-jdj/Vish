@@ -22,7 +22,6 @@
     "lang_fr": "French",
     "lang_es": "Spanish",
 
-    "about": "About",
     "settings": "Settings",
     "appearance": "Appearance",
     "theme": "Theme",
@@ -31,6 +30,20 @@
     "debug": "Debug mode",
     "using_tty": "Use TTY",
     "close": "Close",
+
+    "about": "About",
+    "app_name": "Visual Bash Editor",
+    "app_tagline": "A visual way to build Bash scripts",
+
+    "about_website": "Website",
+    "about_report": "Report an issue",
+    "about_credits": "Credits",
+    "about_legal": "Legal",
+    "about_whats_new": "What's new?",
+    "about_questions": "FAQs",
+    "about_support": "Support the project",
+
+    "about_legal_text": "This software is provided as-is, without any warranty.",
 
     "Commands": "Commands",
     "Flow": "Flow",

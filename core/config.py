@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from core.debug import Debug, Info
 
 class Config:
@@ -35,3 +36,15 @@ class ConfigManager:
         config_dict = dict(ConfigManager.serialize_config(Config))
         with open(Info.get_config_path(), "w") as f:
             json.dump(config_dict, f, indent=4)
+
+class MarkdownLoader:
+    @staticmethod
+    def load_markdown(file):
+        try:
+            base_dir = Path(__file__).resolve().parent.parent
+            path = base_dir / "assets" / "markdown" / file
+            with open(path, "r") as f:
+                return f.read()
+        except Exception as e:
+            Debug.Error(f"Failed to load markdown file: {e}")
+            return ""
