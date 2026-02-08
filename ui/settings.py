@@ -9,9 +9,6 @@ from core.config import Config, ConfigManager
 from core.traduction import Traduction
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 
-# BUGS FOUNDS:
-# - When changing theme from dark to purple, it don't update te graph view ?? JUST WHY ??????
-
 def set_config_bool(attr_name: str, value: bool):
     if not hasattr(Config, attr_name):
         raise AttributeError(f"Config has no attribute '{attr_name}'")
@@ -175,6 +172,9 @@ class SettingsDialog(QDialog):
             set_purple_theme()
         elif theme == "white":
             set_white_theme()
+
+        if self.parent():
+            self.parent().graph_view.apply_theme()
 
     def on_lang_changed(self):
         lang = self.lang_combo.currentData()
