@@ -8,6 +8,7 @@ from PySide6.QtGui import QPainter, QColor
 from core.config import Config, ConfigManager
 from core.traduction import Traduction
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
+from ui.menu_style import apply_menu_style, apply_btn_style
 
 def set_config_bool(attr_name: str, value: bool):
     if not hasattr(Config, attr_name):
@@ -175,6 +176,8 @@ class SettingsDialog(QDialog):
 
         if self.parent():
             self.parent().graph_view.apply_theme()
+            apply_menu_style(self.parent().more_menu)
+            apply_btn_style(self.parent().more_btn)
 
     def on_lang_changed(self):
         lang = self.lang_combo.currentData()
