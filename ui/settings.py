@@ -11,7 +11,6 @@ from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 
 # BUGS FOUNDS:
 # - When changing theme from dark to purple, it don't update te graph view ?? JUST WHY ??????
-# - Missing some translations in settings dialog 
 
 def set_config_bool(attr_name: str, value: bool):
     if not hasattr(Config, attr_name):
@@ -63,10 +62,16 @@ class SettingsDialog(QDialog):
 
         self.refresh_ui_texts()
 
+    def make_section_title(self, key, fallback):
+        label = QLabel(Traduction.get_trad(key, fallback))
+        label.setStyleSheet("font-weight: bold;")
+        return label
+
     def _build_appearance_section(self):
-        title = QLabel(Traduction.get_trad("appearance", "Appearance"))
-        title.setStyleSheet("font-weight: bold;")
-        self.layout.addWidget(title)
+        self.appearance_title = self.make_section_title(
+            "appearance", "Appearance"
+        )
+        self.layout.addWidget(self.appearance_title)
 
         self.theme_combo = QComboBox()
         self.theme_combo.addItem(
@@ -84,17 +89,22 @@ class SettingsDialog(QDialog):
         )
         self.theme_combo.currentIndexChanged.connect(self.on_theme_changed)
 
+        self.theme_label = QLabel(
+            Traduction.get_trad("theme", "Theme")
+        )
+
         row = QHBoxLayout()
-        row.addWidget(QLabel(Traduction.get_trad("theme", "Theme")))
+        row.addWidget(self.theme_label)
         row.addStretch()
         row.addWidget(self.theme_combo)
 
         self.layout.addLayout(row)
 
     def _build_language_section(self):
-        title = QLabel(Traduction.get_trad("language", "Language"))
-        title.setStyleSheet("font-weight: bold;")
-        self.layout.addWidget(title)
+        self.language_title = self.make_section_title(
+            "language", "Language"
+        )
+        self.layout.addWidget(self.language_title)
 
         self.lang_combo = QComboBox()
         self.lang_combo.addItem(
@@ -112,17 +122,22 @@ class SettingsDialog(QDialog):
         )
         self.lang_combo.currentIndexChanged.connect(self.on_lang_changed)
 
+        self.language_label = QLabel(
+            Traduction.get_trad("language", "Language")
+        )
+
         row = QHBoxLayout()
-        row.addWidget(QLabel(Traduction.get_trad("language", "Language")))
+        row.addWidget(self.language_label)
         row.addStretch()
         row.addWidget(self.lang_combo)
 
         self.layout.addLayout(row)
 
     def _build_advanced_section(self):
-        title = QLabel(Traduction.get_trad("advanced", "Advanced"))
-        title.setStyleSheet("font-weight: bold;")
-        self.layout.addWidget(title)
+        self.advanced_title = self.make_section_title(
+            "advanced", "Advanced"
+        )
+        self.layout.addWidget(self.advanced_title)
 
         self.debug_row, self.debug_label = create_switch_row(
             "debug", "Debug mode", "DEBUG"
@@ -134,16 +149,13 @@ class SettingsDialog(QDialog):
         )
         self.layout.addLayout(self.tty_row)
 
-
     def _build_footer(self):
         self.layout.addStretch()
 
         footer = QHBoxLayout()
         footer.addStretch()
 
-        self.close_btn = QPushButton(
-            Traduction.get_trad("close", "Close")
-        )
+        self.close_btn = QPushButton()
         self.close_btn.clicked.connect(self.accept)
 
         footer.addWidget(self.close_btn)
@@ -180,8 +192,21 @@ class SettingsDialog(QDialog):
             Traduction.get_trad("settings", "Settings")
         )
 
-        self.close_btn.setText(
-            Traduction.get_trad("close", "Close")
+        self.appearance_title.setText(
+            Traduction.get_trad("appearance", "Appearance")
+        )
+        self.language_title.setText(
+            Traduction.get_trad("language", "Language")
+        )
+        self.advanced_title.setText(
+            Traduction.get_trad("advanced", "Advanced")
+        )
+
+        self.theme_label.setText(
+            Traduction.get_trad("theme", "Theme")
+        )
+        self.language_label.setText(
+            Traduction.get_trad("language", "Language")
         )
 
         self.debug_label.setText(
@@ -189,6 +214,10 @@ class SettingsDialog(QDialog):
         )
         self.tty_label.setText(
             Traduction.get_trad("using_tty", "Use TTY")
+        )
+
+        self.close_btn.setText(
+            Traduction.get_trad("close", "Close")
         )
 
         if self.parent():
