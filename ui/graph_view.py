@@ -326,7 +326,6 @@ class GraphView(QGraphicsView):
     def get_selected_nodes(self):
         return [item.node for item in self.get_selected_node_items()]
     
-    # TODO: CTRL X / CTRL D/ CTRL A/ F to cut/duplicate/select all/focus node
     def copy_selection(self):
         nodes = self.get_selected_nodes()
         if not nodes:
