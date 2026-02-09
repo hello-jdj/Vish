@@ -2,31 +2,31 @@ from theme.theme import Theme
 
 def apply_menu_style(menu):
     menu.setStyleSheet(f"""
-    QMenu {{
-        background-color: {Theme.BACKGROUND};
-        color: {Theme.TEXT};
-        border-radius: 12px;
-        padding: 8px;
-        border: 1px solid {Theme.BUTTON_PRESSED};
-        font-size: 14px;
-    }}
+        QMenu {{
+            background-color: {Theme.BACKGROUND};
+            color: {Theme.TEXT};
+            border-radius: 12px;
+            padding: 8px;
+            border: 1px solid {Theme.BUTTON_PRESSED};
+            font-size: 14px;
+        }}
 
-    QMenu::item {{
-        padding: 10px 22px;
-        border-radius: 8px;
-        min-width: 150px;
-    }}
+        QMenu::item {{
+            padding: 10px 22px;
+            border-radius: 8px;
+            min-width: 150px;
+        }}
 
-    QMenu::item:selected {{
-        background-color: {Theme.BUTTON_HOVER};
-    }}
+        QMenu::item:selected {{
+            background-color: {Theme.BUTTON_HOVER};
+        }}
 
-    QMenu::separator {{
-        height: 1px;
-        background: {Theme.BUTTON_PRESSED};
-        margin: 8px 10px;
-    }}
-""")
+        QMenu::separator {{
+            height: 1px;
+            background: {Theme.BUTTON_PRESSED};
+            margin: 8px 10px;
+        }}
+    """)
 
 
 
