@@ -5,6 +5,8 @@ from core.debug import Debug, Info
 class Config:
     DEBUG = False
     USING_TTY = True
+    SYNC_NODES_AND_GEN = False
+    AUTO_SAVE = False
     lang = "en"
     theme = "dark"
     

@@ -7,10 +7,12 @@ from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
 from core.port_types import PortDirection
 from core.validator import GraphValidator
+from core.config import Config
 
 class GraphScene(QGraphicsScene):
     node_selected = Signal(object)
     connection_created = Signal(object, object)
+    graph_changed = Signal() 
 
     def __init__(self, graph):
         super().__init__()
@@ -105,6 +107,8 @@ class GraphScene(QGraphicsScene):
             edge = self.graph.add_edge(source_item.port, target_item.port)
             if edge:
                 self.views()[0].add_edge_item(edge)
+                if Config.SYNC_NODES_AND_GEN:
+                    self.graph_changed.emit()
             if edge_item.scene() is self:
                 self.removeItem(edge_item)
 

@@ -276,6 +276,9 @@ class GraphView(QGraphicsView):
         if event.key() == Qt.Key_F: # F
             self.auto_layout()
             return
+        if event.key() == Qt.Key_R: # R
+            self.rebuild_graph()
+            return
 
         super().keyPressEvent(event)
 
@@ -326,18 +329,19 @@ class GraphView(QGraphicsView):
     def get_selected_nodes(self):
         return [item.node for item in self.get_selected_node_items()]
     
-    def copy_selection(self):
+    def copy_selection(self, message=True):
         nodes = self.get_selected_nodes()
         if not nodes:
             return
 
         self.paste_offset = (30, 30)
-        Debug.Log(f"Copying {len(nodes)} nodes")
+        if message:
+            Debug.Log(f"Copying {len(nodes)} nodes")
 
         data = self.serializer.serialize_subgraph(nodes)
         self.clipboard.set(data)
 
-    def paste(self, scene_pos=None):
+    def paste(self, scene_pos=None, message=True):
         if not self.clipboard.has_data():
             return
 
@@ -387,7 +391,8 @@ class GraphView(QGraphicsView):
                 self.add_edge_item(edge)
 
         self.paste_offset = (self.paste_offset[0] + 10, self.paste_offset[1] + 10)
-        Debug.Log(f"Pasted {len(nodes_data)} nodes")
+        if message:
+            Debug.Log(f"Pasted {len(nodes_data)} nodes")
 
     def auto_layout(self):
         l = GraphLayoutEngine(self.graph)
@@ -490,3 +495,16 @@ class GraphView(QGraphicsView):
 
         self.zoom_widget.move(10, self.height() - 42)
         self.zoom_widget.show()
+
+    def rebuild_graph(self):
+        for item in self.scene().items():
+            if isinstance(item, NodeItem):
+                item.setSelected(True)
+        self.copy_selection(message=False)
+        node_items = [it for it in self.graph_scene.selectedItems() if isinstance(it, NodeItem)]
+        for it in node_items:
+            self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
+        self.paste_offset = (0, 0)
+        self.paste(message=False)
+        self.paste_offset = (30, 30)
+        
