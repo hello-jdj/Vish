@@ -42,6 +42,7 @@ def create_switch_row(label_key, fallback, config_attr):
     return row, label
 
 class SettingsDialog(QDialog):
+    traduction_changed = Signal()
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -195,6 +196,8 @@ class SettingsDialog(QDialog):
         Config.lang = lang
         Traduction.set_translate_model(lang)
         ConfigManager.save_config()
+
+        self.traduction_changed.emit()
 
         self.refresh_ui_texts()
 
