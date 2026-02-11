@@ -1,4 +1,7 @@
 from theme.theme import Theme
+import os
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import QSize
 
 def apply_menu_style(menu):
     menu.setStyleSheet(f"""
@@ -45,3 +48,21 @@ def apply_btn_style(btn):
             image: none;
         }}
     """)
+
+def get_icon(name):
+    theme = Theme.selected_theme
+    if theme == "dark":
+        path = os.path.join("assets", "icons", "dark", "menu", f"{name}.png")
+        if os.path.exists(path):
+            return QIcon(path)
+    elif theme == "white":
+        path = os.path.join("assets", "icons", "light","menu", f"{name}.png")
+        if os.path.exists(path):           
+            return QIcon(path)
+    return None
+
+def apply_icon_for_btn(btn, name):
+    icon = get_icon(name)
+    if icon:
+        pixmap = icon.pixmap(100, 100)
+        btn.setIcon(QIcon(pixmap))
