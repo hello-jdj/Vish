@@ -366,6 +366,7 @@ class VisualBashEditor(QMainWindow):
         self.more_btn.setToolTip(Traduction.get_trad("more_options", "More options"))
         self.settings_action.setText(Traduction.get_trad("settings", "Settings"))
         self.about_action.setText(Traduction.get_trad("about", "About"))
+        self.keyboard.setText(Traduction.get_trad("keyboard_shortcuts", "Keyboard Shortcuts"))
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Save): # Ctrl+S
