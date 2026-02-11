@@ -10,33 +10,33 @@ SHORTCUTS = {
     "general": {
         "title": ("general", "General"),
         "items": [
-            (["ctrl", "s"], "Save graph"),
-            (["ctrl", "o"], "Load graph"),
-            (["ctrl", "g"], "Generate bash script"),
-            (["ctrl", "r"], "Run bash script"),
+            (["ctrl", "s"], "shortcut_save_graph"),
+            (["ctrl", "o"], "shortcut_load_graph"),
+            (["ctrl", "g"], "shortcut_generate_bash"),
+            (["ctrl", "r"], "shortcut_run_bash"),
         ],
     },
     "edition": {
         "title": ("edition", "Edition"),
         "items": [
-            (["ctrl", "c"], "Copy selection"),
-            (["ctrl", "v"], "Paste"),
-            (["ctrl", "x"], "Cut selection"),
-            (["ctrl", "z"], "Undo"),
-            (["ctrl", "shift", "z"], "Redo (1)"),
-            (["ctrl", "y"], "Redo (2)"),
-            (["ctrl", "a"], "Select all nodes"),
-            (["ctrl", "d"], "Duplicate selection"),
-            (["del"], "Delete selected nodes"),
-            (["ctrl", "space"], "Open node palette for selected node"),
+            (["ctrl", "c"], "shortcut_copy_selection"),
+            (["ctrl", "v"], "shortcut_paste"),
+            (["ctrl", "x"], "shortcut_cut_selection"),
+            (["ctrl", "z"], "shortcut_undo"),
+            (["ctrl", "shift", "z"], "shortcut_redo_1"),
+            (["ctrl", "y"], "shortcut_redo_2"),
+            (["ctrl", "a"], "shortcut_select_all"),
+            (["ctrl", "d"], "shortcut_duplicate"),
+            (["del"], "shortcut_delete"),
+            (["ctrl", "space"], "shortcut_node_palette"),
         ],
     },
     "graph": {
         "title": ("graph", "Graph"),
         "items": [
-            (["c"], "Create comment box"),
-            (["f"], "Auto layout graph"),
-            (["r"], "Rebuild graph"),
+            (["c"], "shortcut_comment_box"),
+            (["f"], "shortcut_auto_layout"),
+            (["r"], "shortcut_rebuild_graph"),
         ],
     },
 }
@@ -73,7 +73,7 @@ class ShortcutRow(QWidget):
 
         layout.addSpacing(16)
 
-        text = QLabel(label)
+        text = QLabel(Traduction.get_trad(label, label))
         text.setStyleSheet(f"font-size: 15px; color: {Theme.TEXT}; background: transparent;")
         layout.addWidget(text)
         layout.addStretch()
