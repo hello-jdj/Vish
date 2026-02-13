@@ -5,7 +5,7 @@ import subprocess
 import time
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
-                               QSplitter, QFileDialog, QToolButton, QMenu)
+                               QSplitter, QFileDialog, QToolButton, QMenu, QDialog)
 from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QColor, QKeySequence, QIcon
 from core.graph import Graph
@@ -29,6 +29,8 @@ from core.ansi_to_html import ansi_to_html
 from core.config import Config, ConfigManager
 from core.debug import Info, Debug
 from core.traduction import Traduction
+from core.projects import ProjectManager
+from ui.welcome import WelcomeScreen
 from theme.theme import Theme, set_dark_theme, set_purple_theme, set_white_theme
 
 class NodeFactory:
@@ -47,6 +49,7 @@ class VisualBashEditor(QMainWindow):
         
         self.graph = Graph()
         self.node_factory = NodeFactory()
+        self.project_manager = ProjectManager()
         
         self.setup_ui()
         self.create_initial_graph()
@@ -201,14 +204,19 @@ class VisualBashEditor(QMainWindow):
             Debug.Error(Traduction.get_trad("error_cannot_save_empty_graph", "Cannot save an empty graph."))
             return
 
-        file_path, _ = QFileDialog.getSaveFileName(
-            self, "Save Graph", "", "JSON Files (*.json)"
-        )
-        if file_path:
-            json_data = Serializer.serialize(self.graph, self.graph_view)
-            with open(file_path, 'w') as f:
-                f.write(json_data)
-            Debug.Log(Traduction.get_trad(f"graph_saved_successfully", f"Graph saved successfully to {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
+        if not self.project_manager.get_project_path():
+            Debug.Error("No project loaded.")
+            return
+
+        file_path = self.project_manager.get_graph_path()
+
+        json_data = Serializer.serialize(self.graph, self.graph_view)
+
+        with open(file_path, 'w') as f:
+            f.write(json_data)
+
+        Debug.Log("Project saved.")
+
     
     def load_graph(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -255,7 +263,45 @@ class VisualBashEditor(QMainWindow):
         splitter.setSizes([900, 300, 400])
 
         Debug.Log(Traduction.get_trad("graph_loaded_successfully", f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
+
+    def load_current_project(self):
+        graph_path = self.project_manager.get_graph_path()
+
+        if not graph_path.exists():
+            return
+
+        with open(graph_path, "r") as f:
+            json_data = f.read()
+
+        self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
+
+        splitter = self.graph_view.parent()
+        old_view = self.graph_view
+
+        self.graph_view = GraphView(self.graph, self)
+        splitter.insertWidget(0, self.graph_view)
+
+        old_view.setParent(None)
+        old_view.deleteLater()
+
+        self.graph_view.graph_scene.graph_changed.connect(
+            self.generate_bash
+        )
+
+        self.graph_view.graph_scene.node_selected.connect(
+            self.property_panel.set_node
+        )
+        self.create_initial_graph()
         
+        for node in self.graph.nodes.values():
+            self.graph_view.add_node_item(node)
+
+        for edge in self.graph.edges.values():
+            self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
+
+        splitter.setSizes([900, 300, 400])
+
+
     def run_pty(self, script_path: str) -> str:
         master_fd, slave_fd = pty.openpty()
 
@@ -396,6 +442,10 @@ def main():
 
     Debug.init(editor)
     editor.show()
+
+    welcome = WelcomeScreen(editor, editor.project_manager)
+    if welcome.exec() == QDialog.Accepted:
+        editor.load_current_project()
 
     sys.exit(app.exec())
 

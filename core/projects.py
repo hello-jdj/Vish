@@ -2,6 +2,9 @@ from pathlib import Path
 import json
 from core.debug import Info
 
+class Project:
+    NAME = ""
+    PATH = ""
 
 class ProjectManager:
     MAX_RECENTS = 10
@@ -34,7 +37,8 @@ class ProjectManager:
             }, indent=4)
         )
 
-
+        Project.NAME = name
+        Project.PATH = str(directory)
         self.current_project_path = directory
         self._add_recent(directory)
 
