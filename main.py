@@ -292,7 +292,7 @@ class VisualBashEditor(QMainWindow):
             self.property_panel.set_node
         )
         self.create_initial_graph()
-        
+
         for node in self.graph.nodes.values():
             self.graph_view.add_node_item(node)
 
@@ -446,6 +446,8 @@ def main():
     welcome = WelcomeScreen(editor, editor.project_manager)
     if welcome.exec() == QDialog.Accepted:
         editor.load_current_project()
+    elif welcome.result() == QDialog.Rejected:
+        Debug.Log(Traduction.get_trad("no_project_loaded", "No project loaded. You can create or open a project from the welcome screen."))
 
     sys.exit(app.exec())
 
