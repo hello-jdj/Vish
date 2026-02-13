@@ -1,4 +1,4 @@
-import platform
+import sys
 IS_WINDOWS = sys.platform == "win32"
 
 if not IS_WINDOWS:
@@ -341,19 +341,47 @@ class VisualBashEditor(QMainWindow):
 
         return "\n".join(filtered)
 
+    def find_bash(self):
+        if not IS_WINDOWS:
+            return "bash"
+
+        possible_paths = [
+            r"C:\Program Files\Git\bin\bash.exe",
+            r"C:\Program Files (x86)\Git\bin\bash.exe"
+        ]
+
+        for path in possible_paths:
+            if os.path.exists(path):
+                return path
+
+        import shutil
+        bash_in_path = shutil.which("bash")
+        if bash_in_path:
+            return bash_in_path
+
+        return None
+
 
     def run_no_pty(self, script_path: str) -> str:
+        bash_cmd = self.find_bash()
+
+        if not bash_cmd:
+            return (
+                "\x1b[1;31mError:\x1b[0m\n"
+                "No Bash executable found.\nInstall Git Bash or enable WSL."
+            )
+
         result = subprocess.run(
-            ["bash", script_path],
+            [bash_cmd, script_path],
             capture_output=True,
             text=True
         )
-        output = result.stdout
-        error = result.stderr
 
-        if error:
-            return f"\x1b[1;31mError:\x1b[0m\n{error}"
-        return output
+        if result.stderr:
+            return f"\x1b[1;31mError:\x1b[0m\n{result.stderr}"
+
+        return result.stdout
+
     
     def run_bash(self):
         if Info.get_os() == "Windows":
