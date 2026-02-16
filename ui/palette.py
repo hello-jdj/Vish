@@ -7,6 +7,7 @@ from nodes.registry import NODE_REGISTRY
 from theme.theme import Theme
 import os
 from core.traduction import Traduction
+from core.debug import Info
 
 links = {}
 
@@ -145,11 +146,8 @@ class NodePalette(QWidget):
         super().closeEvent(event)
 
     def get_icon(self, category):
-        theme = Theme.selected_theme
-        if theme == "dark":
-            if os.path.exists("assets/icons/dark/{}.png".format(category.lower().replace(" ", "_"))):
-                return QIcon("assets/icons/dark/{}.png".format(category.lower().replace(" ", "_")))
-        elif theme == "white":
-            if os.path.exists("assets/icons/light/{}.png".format(category.lower().replace(" ", "_"))):
-                return QIcon("assets/icons/light/{}.png".format(category.lower().replace(" ", "_")))
+        theme = Theme.type
+        path = Info.resource_path(f"assets/icons/{theme}/{category.lower().replace(' ', '_')}.png")
+        if os.path.exists(path):
+            return QIcon(path)
         return None

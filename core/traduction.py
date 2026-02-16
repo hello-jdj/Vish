@@ -1,11 +1,12 @@
 import json
+from core.debug import Info
 
 class Traduction:
     model = {}
     
     @staticmethod
     def set_translate_model(lang: str):
-        trad_file = "assets/models/{}.json".format(lang)
+        trad_file = Info.resource_path(f"assets/models/{lang}.json")
         try:
             with open(trad_file) as data:
                 Traduction.model = json.load(data)

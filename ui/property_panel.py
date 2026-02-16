@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit
 )
 
-class PropertyPanel(QWidget):
+class PropertyPanel(QWidget): # TODO: traduction
     def __init__(self, parent=None):
         super().__init__(parent)
         self.layout = QVBoxLayout(self)

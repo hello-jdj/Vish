@@ -4,6 +4,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 from core.traduction import Traduction
 from theme.theme import Theme
+from core.debug import Info
 
 
 SHORTCUTS = {
@@ -45,9 +46,9 @@ SHORTCUTS = {
 class KeyImage(QLabel):
     def __init__(self, key):
         super().__init__()
-        path = f"assets/icons/keyboard/{key}.png"
+        path = Info.resource_path(f"assets/icons/keyboard/{key}.png")
         if not os.path.exists(path):
-            path = f"assets/icons/keyboard/unknown.png"
+            path = Info.resource_path(f"assets/icons/keyboard/unknown.png")
         pix = QPixmap(path)
         pix.setDevicePixelRatio(2)
         # pix = pix.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
