@@ -1,6 +1,7 @@
 # own gitignore file
 test/
-
+build*
+flatpak-*
 
 
 # Byte-compiled / optimized / DLL files
