@@ -32,6 +32,7 @@
     "using_tty": "Usar TTY",
     "sync_nodes_and_gen": "Sincronizar nodos y generación",
     "auto_save": "Guardado automático",
+    "custom_shebang": "Shebang personalizado",
     "close": "Cerrar",
 
     "app_name": "Visual Bash Editor",
