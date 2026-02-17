@@ -31,6 +31,7 @@
     "using_tty": "Use TTY",
     "sync_nodes_and_gen": "Sync Nodes and Generation",
     "auto_save": "Auto Save",
+    "custom_shebang": "Custom Shebang",
     "close": "Close",
 
     "about": "About",
