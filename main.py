@@ -464,6 +464,8 @@ def main():
     Traduction.set_translate_model(Config.lang)
 
     app = QApplication(sys.argv)
+    app.setOrganizationName("Lluciocc")
+    app.setApplicationName("Vish")
     app.setWindowIcon(QIcon(Info.resource_path("assets/icons/icon.png")))
     editor = VisualBashEditor()
 
