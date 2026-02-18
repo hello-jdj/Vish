@@ -12,7 +12,6 @@ finish-args:
   - --socket=wayland
   - --socket=fallback-x11
   - --device=dri
-  - --filesystem=home
 
 modules:
   - name: vish
@@ -30,3 +29,4 @@ modules:
       - type: git
         url: https://github.com/Lluciocc/Vish.git
         tag: v1.0.2
+        commit: 991829a246459ff5ea23dc344ebb3795846f0cff

@@ -40,6 +40,8 @@ class Info:
     
     @staticmethod
     def get_config_path():
+        print("HOME =", Path.home())
+        print("CONFIG PATH =", Info.CONFIG_PATH)
         Info.ensure_config_dir_exists()
         return Info.CONFIG_PATH
     
