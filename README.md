@@ -27,6 +27,18 @@ It can help beginners understand the structure and flow of Bash scripts, making 
 ## Wiki
 For more detailed information about Vish, including installation instructions, usage guides, and troubleshooting tips, please visit the [Wiki](https://github.com/lluciocc/vish/wiki).
 
+## Installation
+### From flatpak
+You can install Vish from Flathub using the following command:
+```bash 
+flatpak install --from https://flatpak.lluciocc.fr/vish.flatpakref
+```
+### From AppImage
+You can download the latest AppImage from the [releases page](https://github.com/lluciocc/vish/releases/latest). After downloading, make the AppImage executable and run it:
+```bash
+chmod +x Vish-*.AppImage
+./Vish-*.AppImage
+```
 
 ## Contributing
 ### Coding
