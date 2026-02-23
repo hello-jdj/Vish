@@ -84,7 +84,7 @@ class Modulo(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} % {b}))"
 
-@register_node("less_than", category="Logic", label="Less Than")
+@register_node("less_than", category="Logic", label="Less Than", description="Is A less than B?")
 class LessThan(MathNode):
     def __init__(self):
         super().__init__("less_than", "Less Than", "#95A5A6")
@@ -97,7 +97,7 @@ class LessThan(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"(( {a} < {b} ))"
 
-@register_node("greater_than", category="Logic", label="Greater Than")
+@register_node("greater_than", category="Logic", label="Greater Than", description="Is A greater than B?")
 class GreaterThan(MathNode):
     def __init__(self):
         super().__init__("greater_than", "Greater Than", "#95A5A6")
