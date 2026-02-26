@@ -10,7 +10,7 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 - Save and load visual scripts in JSON format
 - Various user friendly features to enhance the scripting experience
 - Themes support (Light/Dark/Purple)
-- Translation support (English/French/Spanish)
+- Multi-language support
 - Settings to customize the editor behavior and appearance
 - Partial Windows support (some features may be limited or unavailable on Windows)
 
@@ -52,6 +52,7 @@ Contributions are welcome! If you would like to contribute to Vish, please follo
 3. Make your changes and commit them (`git commit -am 'Add new feature'`)
 4. Push to the branch (`git push origin feature-branch`)
 5. Create a new Pull Request
+6. Optional: Consider adding a screenshot of your work in the PR description.
 
 Note: Please ensure your code adheres to the existing coding style and includes appropriate tests.- This project is in active development. Features may change, and bugs may be present.
 
