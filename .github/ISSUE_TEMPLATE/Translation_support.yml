@@ -1,0 +1,58 @@
+name: "Report a translation issue"
+description: Report incorrect, missing, or inconsistent translations
+labels: [translation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check if this translation issue has already been reported at
+        [Vish/issues](https://github.com/Lluciocc/Vish/issues) and add details there if it exists.
+
+  - type: dropdown
+    attributes:
+      label: Type of translation issue
+      description: What kind of problem are you reporting?
+      options:
+        - Incorrect translation
+        - Missing translation
+        - Inconsistent wording
+        - Grammar / spelling mistake
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Language
+      placeholder: e.g. French, Spanish, German...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Location
+      description: Where does the issue appear? (page, section, dialog, etc.)
+      placeholder: e.g. Settings → General
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Current text
+      description: The text as it currently appears
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Suggested correction
+      description: What should the correct translation be?
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Screenshots or extra details can be added here
+    validations:
+      required: false
