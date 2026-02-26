@@ -67,14 +67,7 @@ An other way to contribute Vish is to help translating it in other languages. If
 8. Create a new Pull Request
 
 ## Credits
-- Developed by Lluciocc
-- Inspired by Unreal Engine's Blueprint system
-- Every icon are from [Pictogrammers](https://pictogrammers.com/library/mdi/)
-- ANSI to HTML conversion code inspired from [ansi-to-html](https://github.com/pycontribs/ansi2html)
-- Some style inspired from TheGnomeProject's Adwaita theme
-- Thanks to the PySide6 documentation [https://doc.qt.io/qtforpython/](https://doc.qt.io/qtforpython/)
-- Thanks [Alan Bork](alanbork@gmail.com) for his help for founding the icons 
-- Xelu's assets for [keyboard icons](https://thoseawesomeguys.com/prompts)
+You can find the list of contributors and acknowledgements in the [CREDITS](assets/markdown/CREDITS.md) file.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
