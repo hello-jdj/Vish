@@ -66,6 +66,10 @@ An other way to contribute Vish is to help translating it in other languages. If
 6. Commit your changes (`git commit -am 'Add translation for [Language]'`)
 7. Push to the branch (`git push origin translation-branch`)
 8. Create a new Pull Request
+9. To ensure your translation is correct, you can check it using [this script](https://github.com/Lluciocc/vish-utils/blob/main/check_trad.py)
+ or by typing `bot, check [your_file.json]` in the PR comments.
+
+**Note:** If your file contains additional keys, they will be flagged as extra keys. These should only be present if you have added something to the UI. If any keys are missing, please correct them before requesting a review.
 
 ## Node Notation Convention
 
