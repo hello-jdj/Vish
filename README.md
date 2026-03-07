@@ -7,7 +7,7 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 - Intuitive drag-and-drop interface
 - Easy visualization of script flow and logic
 - Run generated Bash scripts directly from the editor
-- Save and load visual scripts in JSON format
+- Project system to create and manage multiple projects
 - Various user friendly features to enhance the scripting experience
 - Themes support (Light/Dark/Purple/Breeze Dark)
 - Multi-language support
@@ -16,7 +16,7 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 
 ## Screenshots
 
-<img width="3072" height="1664" alt="Screenshot of Vish showing nodes and generated bash script with a script that call function that print the license file" src="https://github.com/Lluciocc/vish-utils/blob/main/screenshots/screenshots1.png" />
+<img width="3072" height="1664" Workflow management projectsalt="Screenshot of Vish showing nodes and generated bash script with a script that call function that print the license file" src="https://github.com/Lluciocc/vish-utils/blob/main/screenshots/screenshots1.png" />
 <img width="3072" height="1728" alt="Screenshot of Vish showing nodes and generated bash script with a simple script that tell if a number is odd or even" src="https://github.com/Lluciocc/vish-utils/blob/main/screenshots/screenshots2.png" />
 
 ## Notes
