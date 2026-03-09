@@ -153,7 +153,7 @@ class WelcomeScreen(QDialog):
 
         self.setWindowTitle("  ")
         self.setModal(True)
-        self.setMinimumSize(620, 480)
+        self.setMinimumSize(360, 294)
 
         self.setStyleSheet(f"""
             QDialog {{
