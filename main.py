@@ -6,10 +6,12 @@ from PySide6.QtCore import Qt
 from core.graph import Graph
 from core.bash_emitter import BashEmitter
 from core.serializer import Serializer
+from core.debug import Debug
 from nodes.flow_nodes import StartNode, IfNode, ForNode
 from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode
 from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNode
 from nodes.operation_nodes import Addition
+from nodes.utils_node import ToString
 from ui.graph_view import GraphView
 from ui.palette import NodePalette
 from ui.property_panel import PropertyPanel
@@ -157,6 +159,7 @@ class VisualBashEditor(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     editor = VisualBashEditor()
+    Debug.init(editor)
     editor.show()
     sys.exit(app.exec())
 

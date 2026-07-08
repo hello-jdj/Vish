@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QGraphicsScene
 from PySide6.QtCore import Signal, QTimer
 from PySide6.QtGui import QCursor, QPen, QColor
+from core.debug import Debug
 from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
 from core.port_types import PortDirection
@@ -164,6 +165,7 @@ class GraphScene(QGraphicsScene):
         self.start_port = None
 
     def _show_invalid_feedback(self, a, b):
+        #Debug.Error("Invalid connection")
         edge = self.drag_edge
         if not edge:
             return
