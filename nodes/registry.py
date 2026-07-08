@@ -10,3 +10,9 @@ def register_node(node_type: str, *, label=None, category="Other", description="
         }
         return cls
     return decorator
+
+def create_node(node_type):
+    entry = NODE_REGISTRY.get(node_type)
+    if not entry:
+        raise ValueError(f"Unknown node type: {node_type}")
+    return entry["class"]()
