@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import platform
+import sys
 from ui.info import MessageWidget
 
 class Debug:
@@ -47,7 +48,11 @@ class Info:
         config_dir = os.path.dirname(Info.CONFIG_PATH)
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
-            
 
-
-
+    @staticmethod
+    def resource_path(relative_path):
+        if hasattr(sys, "_MEIPASS"):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)

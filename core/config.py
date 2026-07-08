@@ -43,8 +43,7 @@ class MarkdownLoader:
     @staticmethod
     def load_markdown(file):
         try:
-            base_dir = Path(__file__).resolve().parent.parent
-            path = base_dir / "assets" / "markdown" / file
+            path = Info.resource_path(f"assets/markdown/{file}")
             with open(path, "r") as f:
                 return f.read()
         except Exception as e:

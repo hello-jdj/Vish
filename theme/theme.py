@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QApplication
 
 class Theme:
     selected_theme = "dark"
+    type = "dark"
     BACKGROUND = None
     PANEL = None
     TEXT = None
@@ -53,6 +54,7 @@ def set_dark_theme():
         }}
     """)
     Theme.selected_theme = "dark"
+    Theme.type = "dark"
 
 def set_white_theme():
     app = QApplication.instance()
@@ -98,6 +100,7 @@ def set_white_theme():
         }}
     """)
     Theme.selected_theme = "white"
+    Theme.type = "light"
 
 def set_purple_theme():
     app = QApplication.instance()
@@ -143,5 +146,4 @@ def set_purple_theme():
         }}
     """)
     Theme.selected_theme = "dark"
-
-
+    Theme.type = "dark"
