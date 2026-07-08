@@ -1,7 +1,9 @@
 from core.port_types import PortType
 from core.bash_emitter import BashContext
+from nodes.registry import register_node
 from .base_node import BaseNode
 
+@register_node("start")
 class StartNode(BaseNode):
     def __init__(self):
         super().__init__("start", "Start", "#4A90E2")
@@ -10,6 +12,7 @@ class StartNode(BaseNode):
     def emit_bash(self, context: BashContext) -> str:
         return ""
 
+@register_node("if")
 class IfNode(BaseNode):
     def __init__(self):
         super().__init__("if", "If", "#E94B3C")
@@ -52,6 +55,7 @@ class IfNode(BaseNode):
         context.add_line("fi")
         return ""
 
+@register_node("for")
 class ForNode(BaseNode):
     def __init__(self):
         super().__init__("for", "For Loop", "#9B59B6")

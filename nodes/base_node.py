@@ -10,3 +10,6 @@ class BaseNode(Node):
     @abstractmethod
     def emit_bash(self, context: BashContext) -> str:
         pass
+
+    def emit_bash_value(self, context):
+        return None

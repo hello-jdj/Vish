@@ -9,29 +9,19 @@ from core.serializer import Serializer
 from nodes.flow_nodes import StartNode, IfNode, ForNode
 from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode
 from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNode
+from nodes.operation_nodes import Addition
 from ui.graph_view import GraphView
 from ui.palette import NodePalette
 from ui.property_panel import PropertyPanel
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
+from nodes.registry import NODE_REGISTRY
 
 class NodeFactory:
     @staticmethod
     def create_node(node_type: str):
-        nodes = {
-            "start": StartNode,
-            "run_command": RunCommandNode,
-            "echo": EchoNode,
-            "exit": ExitNode,
-            "if": IfNode,
-            "for": ForNode,
-            "set_variable": SetVariableNode,
-            "get_variable": GetVariableNode,
-            "file_exists": FileExistsNode,
-        }
-        
-        if node_type in nodes:
-            return nodes[node_type]()
-        return None
+        cls = NODE_REGISTRY.get(node_type)
+        return cls() if cls else None
+
 
 class VisualBashEditor(QMainWindow):
     def __init__(self):
@@ -146,7 +136,7 @@ class VisualBashEditor(QMainWindow):
         splitter = self.graph_view.parent()
         old_view = self.graph_view
 
-        self.graph_view = GraphView(self.graph)
+        self.graph_view = GraphView(self.graph, self)
         splitter.insertWidget(0, self.graph_view)
 
         old_view.setParent(None)
@@ -157,6 +147,11 @@ class VisualBashEditor(QMainWindow):
 
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
+
+    def set_theme(self, theme_fn):
+        theme_fn()
+        self.graph_view.scene().update()
+
 
 def main():
     app = QApplication(sys.argv)
