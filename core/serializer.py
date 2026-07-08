@@ -100,12 +100,19 @@ class Serializer:
         }
 
     def serialize_edge(self, edge):
+        src_node = edge.source.node
+        tgt_node = edge.target.node
+
+        src_out_index = src_node.outputs.index(edge.source)
+        tgt_in_index = tgt_node.inputs.index(edge.target)
+
         return {
-            "source_node": edge.source.node.id,
-            "source_port": edge.source.id,
-            "target_node": edge.target.node.id,
-            "target_port": edge.target.id,
+            "source_node": src_node.id,
+            "source_output_index": src_out_index,
+            "target_node": tgt_node.id,
+            "target_input_index": tgt_in_index,
         }
+
 
     def serialize_subgraph(self, nodes):
         node_ids = {n.id for n in nodes}

@@ -11,6 +11,7 @@ from theme.theme import Theme
 from core.clipboard import GraphClipboard
 from core.serializer import Serializer
 from nodes.registry import create_node
+from core.debug import Debug
 
 
 class GraphView(QGraphicsView):
@@ -114,24 +115,38 @@ class GraphView(QGraphicsView):
         return node_item
 
     def add_edge_item(self, edge):
-        edge_item = EdgeItem(edge)
+        source_node_item = self.node_items.get(edge.source.node.id)
+        target_node_item = self.node_items.get(edge.target.node.id)
+        if not source_node_item or not target_node_item:
+            return None
+
+        src_port_item = source_node_item.port_items.get(edge.source.id)
+        tgt_port_item = target_node_item.port_items.get(edge.target.id)
+        if not src_port_item or not tgt_port_item:
+            return None
+
+        edge_item = EdgeItem()
+        edge_item.source_port = src_port_item
+        edge_item.target_port = tgt_port_item
+        edge_item.edge = edge
+
         self.graph_scene.addItem(edge_item)
+        edge_item.update_positions()
+
+        self.graph_scene.edges.append(edge_item)
         self.edge_items[edge.id] = edge_item
-        self.update_edge_item(edge_item)
         return edge_item
+    
+    def remove_edge_item(self, edge_id):
+        edge_item = self.edge_items.get(edge_id)
+        if not edge_item:
+            return
+        if edge_item.scene() is self.graph_scene:
+            self.graph_scene.removeItem(edge_item)
+        if edge_item in self.graph_scene.edges:
+            self.graph_scene.edges.remove(edge_item)
+        del self.edge_items[edge_id]
 
-    def update_edge_item(self, edge_item):
-        source_node_item = self.node_items.get(edge_item.edge.source.node.id)
-        target_node_item = self.node_items.get(edge_item.edge.target.node.id)
-
-        if source_node_item and target_node_item:
-            source_pos = source_node_item.get_port_scene_pos(edge_item.edge.source.id)
-            target_pos = target_node_item.get_port_scene_pos(edge_item.edge.target.id)
-            edge_item.set_positions(source_pos, target_pos)
-
-    def update_all_edges(self):
-        for edge_item in self.edge_items.values():
-            self.update_edge_item(edge_item)
 
     def wheelEvent(self, event):
         zoom_in_factor = 1.15
@@ -210,18 +225,27 @@ class GraphView(QGraphicsView):
             return
 
         node_item = self.node_items[node_id]
+
+        for edge_item in list(self.graph_scene.edges):
+            if (
+                edge_item.source_port in node_item.port_items.values()
+                or edge_item.target_port in node_item.port_items.values()
+            ):
+                if edge_item.edge:
+                    self.graph.remove_edge(edge_item.edge.id)
+                    if edge_item.edge.id in self.edge_items:
+                        del self.edge_items[edge_item.edge.id]
+
+                if edge_item.scene() is self.graph_scene:
+                    self.graph_scene.removeItem(edge_item)
+
+                self.graph_scene.edges.remove(edge_item)
+
         self.graph.remove_node(node_id)
 
-        for edge in list(self.graph_scene.edges):
-            if (edge.source_port in node_item.port_items.values() or
-                edge.target_port in node_item.port_items.values()):
-                if edge.edge:
-                    self.graph.remove_edge(edge.edge.id)
-                if edge.scene() is self.graph_scene:
-                    self.graph_scene.removeItem(edge)
-                self.graph_scene.edges.remove(edge)
+        if node_item.scene() is self.graph_scene:
+            self.graph_scene.removeItem(node_item)
 
-        self.graph_scene.removeItem(node_item)
         del self.node_items[node_id]
 
     def get_selected_node_items(self):
@@ -237,8 +261,8 @@ class GraphView(QGraphicsView):
         nodes = self.get_selected_nodes()
         if not nodes:
             return
-        
-        print("Copying nodes:", len(nodes))
+
+        Debug.Log(f"Copying {len(nodes)} nodes")
 
         data = self.serializer.serialize_subgraph(nodes)
         self.clipboard.set(data)
@@ -261,35 +285,29 @@ class GraphView(QGraphicsView):
 
             id_map[node_data["id"]] = node
 
-        for edge_data in data["edges"]:
+        for edge_data in data.get("edges", []):
             src_node = id_map.get(edge_data["source_node"])
             tgt_node = id_map.get(edge_data["target_node"])
             if not src_node or not tgt_node:
                 continue
 
-            src_port = None
-            tgt_port = None
+            src_i = edge_data["source_output_index"]
+            tgt_i = edge_data["target_input_index"]
 
-            for p in src_node.outputs:
-                if p.id == edge_data["source_port"]:
-                    src_port = p
-                    break
-
-            for p in tgt_node.inputs:
-                if p.id == edge_data["target_port"]:
-                    tgt_port = p
-                    break
-
-            if not src_port or not tgt_port:
+            if src_i >= len(src_node.outputs):
                 continue
+            if tgt_i >= len(tgt_node.inputs):
+                continue
+
+            src_port = src_node.outputs[src_i]
+            tgt_port = tgt_node.inputs[tgt_i]
 
             edge = self.graph.add_edge(src_port, tgt_port)
             if edge:
                 self.add_edge_item(edge)
 
+        Debug.Log(f"Pasted {len(data['nodes'])} nodes")
 
-
-    
     def apply_theme(self):
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))
         self.viewport().update()
