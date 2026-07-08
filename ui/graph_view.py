@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem
-from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent
+from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem, QWidget, QHBoxLayout, QSlider, QLabel, QPushButton
+from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent, QPropertyAnimation, QEasingCurve, Property
 from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence
 from core.graph import Port
 from ui.palette import NodePalette
@@ -13,6 +13,19 @@ from core.serializer import Serializer
 from nodes.registry import create_node
 from core.debug import Debug
 
+class ZoomLabel(QLabel):
+    def mouseDoubleClickEvent(self, event):
+        self.parent().set_zoom(1.0, animated=True)
+
+# class MiniMap(QGraphicsView):
+#     def __init__(self, scene, parent):
+#         super().__init__(scene, parent)
+#         self.setRenderHint(QPainter.Antialiasing)
+#         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+#         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+#         self.setInteractive(False)
+#         self.setStyleSheet("background: rgba(20,20,20,180); border: 1px solid #444;")
+#         self.scale(0.1, 0.1)
 
 class GraphView(QGraphicsView):
     connection_request = Signal(Port, Port)
@@ -40,6 +53,23 @@ class GraphView(QGraphicsView):
         self.serializer = Serializer(self.graph)
         self.node_factory = create_node
         self.paste_offset = (30, 30)
+        self._init_zoom_widget()
+        self._zoom_anim = QPropertyAnimation(self, b"zoom_anim_value")
+        self._zoom_anim.setEasingCurve(QEasingCurve.OutCubic)
+        self._zoom_anim.setDuration(120)
+    #     self._init_minimap()
+
+    def _get_zoom_anim_value(self):
+        return self.scale_factor
+
+    def _set_zoom_anim_value(self, value):
+        self._apply_zoom(value)
+
+    zoom_anim_value = Property(
+        float,
+        _get_zoom_anim_value,
+        _set_zoom_anim_value
+    )
 
     def contextMenuEvent(self, event):
         scene_pos = self.mapToScene(event.pos())
@@ -149,20 +179,13 @@ class GraphView(QGraphicsView):
 
 
     def wheelEvent(self, event):
-        zoom_in_factor = 1.15
-        zoom_out_factor = 1 / zoom_in_factor
-
+        zoom_step = 1.15
         if event.angleDelta().y() > 0:
-            zoom_factor = zoom_in_factor
-            self.scale_factor *= zoom_factor
+            new_factor = self.scale_factor * zoom_step
         else:
-            zoom_factor = zoom_out_factor
-            self.scale_factor *= zoom_factor
+            new_factor = self.scale_factor / zoom_step
+        self.set_zoom(new_factor, animated=True)
 
-        if 0.2 <= self.scale_factor <= 3.0:
-            self.scale(zoom_factor, zoom_factor)
-        else:
-            self.scale_factor /= zoom_factor
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
@@ -327,3 +350,84 @@ class GraphView(QGraphicsView):
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))
         self.viewport().update()
 
+    # def centerOn(self, *args):
+    #     super().centerOn(*args)
+    #     if hasattr(self, "minimap"):
+    #         self.minimap.centerOn(*args)
+
+    # def _init_minimap(self):
+    #     self.minimap = MiniMap(self.graph_scene, self)
+    #     self.minimap.setFixedSize(180, 140)
+    #     self.minimap.move(self.width() - 190, self.height() - 150)
+    #     self.minimap.show()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, "zoom_widget"):
+            self.zoom_widget.move(10, self.height() - 42)
+        # if hasattr(self, "minimap"):
+        #     self.minimap.move(self.width() - 190, self.height() - 150)
+
+    def set_zoom(self, factor, animated=False):
+        factor = max(0.2, min(3.0, factor))
+
+        if animated:
+            self._zoom_anim.stop()
+            self._zoom_anim.setStartValue(self.scale_factor)
+            self._zoom_anim.setEndValue(factor)
+            self._zoom_anim.start()
+        else:
+            self._apply_zoom(factor)
+
+    def _apply_zoom(self, factor):
+        self.resetTransform()
+        self.scale(factor, factor)
+
+        self.scale_factor = factor
+
+        percent = int(factor * 100)
+        self.zoom_label.setText(f"{percent}%")
+
+        slider_value = int(factor * 100)
+        if self.zoom_slider.value() != slider_value:
+            self.zoom_slider.blockSignals(True)
+            self.zoom_slider.setValue(slider_value)
+            self.zoom_slider.blockSignals(False)
+
+    def _on_zoom_slider_changed(self, value):
+        self.set_zoom(value / 100.0)
+
+    def _step_zoom(self, direction):
+        step = 0.1
+        self.set_zoom(self.scale_factor + direction * step, animated=True)
+
+    def _init_zoom_widget(self):
+        self.zoom_widget = QWidget(self)
+        self.zoom_widget.setFixedHeight(32)
+
+        layout = QHBoxLayout(self.zoom_widget)
+        layout.setContentsMargins(6, 0, 6, 0)
+        layout.setSpacing(6)
+
+        self.zoom_out_btn = QPushButton("-")
+        self.zoom_in_btn = QPushButton("+")
+        self.zoom_out_btn.setFixedSize(28, 28)
+        self.zoom_in_btn.setFixedSize(28, 28)
+
+        self.zoom_label = ZoomLabel("100%")
+        self.zoom_slider = QSlider(Qt.Horizontal)
+
+        self.zoom_slider.setRange(20, 300)
+        self.zoom_slider.setValue(100)
+
+        self.zoom_out_btn.clicked.connect(lambda: self._step_zoom(-1))
+        self.zoom_in_btn.clicked.connect(lambda: self._step_zoom(1))
+        self.zoom_slider.valueChanged.connect(self._on_zoom_slider_changed)
+
+        layout.addWidget(self.zoom_out_btn)
+        layout.addWidget(self.zoom_label)
+        layout.addWidget(self.zoom_in_btn)
+        layout.addWidget(self.zoom_slider)
+
+        self.zoom_widget.move(10, self.height() - 42)
+        self.zoom_widget.show()
