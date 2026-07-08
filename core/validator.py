@@ -1,27 +1,52 @@
-from typing import Optional, Tuple
-from .graph import Port, Edge
+from core.port_types import PortDirection
 
-class ValidationError:
-    def __init__(self, message: str):
-        self.message = message
-
-class Validator:
+class GraphValidator:
     @staticmethod
-    def validate_connection(source: Port, target: Port) -> Optional[ValidationError]:
-        if source.direction == target.direction:
-            return ValidationError("Cannot connect same direction ports")
-        
-        if source.port_type != target.port_type:
-            if not (source.port_type.value == "exec" and target.port_type.value == "exec"):
-                return ValidationError(f"Type mismatch: {source.port_type.value} → {target.port_type.value}")
-        
-        if source.direction.value == "input":
-            source, target = target, source
-        
-        if target.port_type.value == "exec":
-            pass
+    def is_valid_connection(graph, existing_edges, a, b) -> bool:
+        if a is b:
+            return False
+
+        if a.port.node.id == b.port.node.id:
+            return False
+
+        if a.is_input == b.is_input:
+            return False
+
+        if a.port.port_type != b.port.port_type:
+            return False
+
+        if a.port.direction == PortDirection.OUTPUT:
+            src = a.port
+            dst = b.port
         else:
-            if target.is_connected():
-                return ValidationError("Input already connected")
-        
-        return None
+            src = b.port
+            dst = a.port
+
+        if GraphValidator._can_reach(graph, dst.node, src.node):
+            return False
+
+        for edge in existing_edges:
+            if edge.target_port is (b if b.is_input else a):
+                return False
+
+        return True
+
+    @staticmethod
+    def _can_reach(graph, start_node, target_node) -> bool:
+        visited = set()
+
+        def dfs(node):
+            if node.id in visited:
+                return False
+            visited.add(node.id)
+
+            if node is target_node:
+                return True
+
+            for edge in graph.edges.values():
+                if edge.source.node is node:
+                    if dfs(edge.target.node):
+                        return True
+            return False
+
+        return dfs(start_node)
