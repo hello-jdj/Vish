@@ -3,6 +3,7 @@ from pathlib import Path
 import platform
 import sys
 from ui.info import MessageWidget
+from PySide6.QtCore import QStandardPaths
 
 class Debug:
     _parent = None
@@ -33,15 +34,13 @@ class Debug:
         Debug._show(message, "info")
 
 class Info:
-    CONFIG_PATH = os.path.join(str(Path.home()), ".config", "visual_bash_editor", "config.json")
+    CONFIG_PATH = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "config.json")
     @staticmethod
     def get_os():
         return platform.system()
     
     @staticmethod
     def get_config_path():
-        print("HOME =", Path.home())
-        print("CONFIG PATH =", Info.CONFIG_PATH)
         Info.ensure_config_dir_exists()
         return Info.CONFIG_PATH
     
