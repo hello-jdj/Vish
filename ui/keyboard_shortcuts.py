@@ -28,6 +28,7 @@ SHORTCUTS = {
             (["ctrl", "a"], "Select all nodes"),
             (["ctrl", "d"], "Duplicate selection"),
             (["del"], "Delete selected nodes"),
+            (["ctrl", "space"], "Open node palette for selected node"),
         ],
     },
     "graph": {

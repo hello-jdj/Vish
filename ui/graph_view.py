@@ -228,6 +228,12 @@ class GraphView(QGraphicsView):
         if event.matches(QKeySequence.Copy): # Ctrl+C
             self.copy_selection()
             return
+        if event.key() == Qt.Key_Space and event.modifiers() & Qt.ControlModifier:
+            selected = self.get_selected_node_items()
+            if len(selected) == 1:
+                self._open_palette_from_selected(selected[0])
+                event.accept()
+                return
         if event.matches(QKeySequence.Paste): # Ctrl+V
             if self.clipboard.has_data():
                 view_pos = self.mapFromGlobal(QCursor.pos())
@@ -495,6 +501,64 @@ class GraphView(QGraphicsView):
 
         self.zoom_widget.move(10, self.height() - 42)
         self.zoom_widget.show()
+
+    def _open_palette_from_selected(self, node_item):
+        scene_pos = node_item.sceneBoundingRect().center()
+
+        if self._palette and self._palette.isVisible():
+            self._palette.close()
+
+        palette = NodePalette(self)
+        self._palette = palette
+
+        palette.node_selected.connect(
+            lambda node_type: self._add_node_connected_to(node_type, node_item)
+        )
+
+        view_pos = self.mapFromScene(scene_pos)
+        global_pos = self.viewport().mapToGlobal(view_pos)
+
+        palette.move(global_pos)
+        palette.show()
+
+    def _add_node_connected_to(self, node_type, source_node_item):
+        editor = self.editor
+        node = editor.node_factory.create_node(node_type)
+        if not node:
+            self.close_node_palette()
+            return
+
+        source_rect = source_node_item.sceneBoundingRect()
+        node.x = source_rect.right() + 120
+        node.y = source_rect.center().y()
+
+        self.undo_stack.push(AddNodeCommand(self, node))
+        self.undo_stack.undo()
+        self.undo_stack.redo()
+
+        new_node_item = self.node_items.get(node.id)
+        if not new_node_item:
+            self.close_node_palette()
+            return
+
+        source_output = None
+        target_input = None
+
+        for p in source_node_item.port_items.values():
+            if not p.is_input:
+                source_output = p
+                break
+
+        for p in new_node_item.port_items.values():
+            if p.is_input:
+                target_input = p
+                break
+
+        if source_output and target_input:
+            self.graph_scene.start_connection(source_output)
+            self.graph_scene.finalize_connection(source_output, target_input)
+
+        self.close_node_palette()
 
     def rebuild_graph(self):
         for item in self.scene().items():
