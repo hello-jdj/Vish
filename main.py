@@ -152,6 +152,8 @@ class VisualBashEditor(QMainWindow):
 
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
+        
+        splitter.setSizes([900, 300, 400])
 
         Debug.Log(f"Graph loaded from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
 
