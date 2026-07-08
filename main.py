@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout,
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
                                QSplitter, QFileDialog, QToolButton, QMenu)
 from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QColor, QKeySequence
+from PySide6.QtGui import QColor, QKeySequence, QIcon
 from core.graph import Graph
 from core.bash_emitter import BashEmitter
 from core.serializer import Serializer
@@ -391,6 +391,7 @@ def main():
     Traduction.set_translate_model(Config.lang)
 
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("assets/icons/icon.png"))
     editor = VisualBashEditor()
 
     Debug.init(editor)
