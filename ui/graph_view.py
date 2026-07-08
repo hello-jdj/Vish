@@ -1,11 +1,12 @@
-from PySide6.QtWidgets import QGraphicsView
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPainter, QColor
+from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem
+from PySide6.QtCore import Qt, Signal, QRectF, QPointF
+from PySide6.QtGui import QPainter, QColor, QCursor
 from core.graph import Port
 from ui.palette import NodePalette
-from .graph_scene import GraphScene
-from .node_item import NodeItem
-from .edge_item import EdgeItem
+from ui.graph_scene import GraphScene
+from ui.node_item import NodeItem
+from ui.edge_item import EdgeItem
+from ui.comment_box import CommentBoxItem
 from theme.theme import Theme
 
 
@@ -155,11 +156,32 @@ class GraphView(QGraphicsView):
         super().mouseReleaseEvent(event)
 
     def keyPressEvent(self, event):
+        if event.key() == Qt.Key_C:
+            self.create_comment_box()
+            event.accept()
+            return
+
         if event.key() == Qt.Key_Delete:
             for item in self.graph_scene.selectedItems():
                 if isinstance(item, NodeItem):
                     self.remove_node_item(item.node.id)
+                elif isinstance(item, CommentBoxItem):
+                    self.graph_scene.removeItem(item)
+            event.accept()
+            return
+
         super().keyPressEvent(event)
+
+
+    
+    def create_comment_box(self):
+        view_pos = self.mapFromGlobal(QCursor.pos())
+        scene_pos = self.mapToScene(view_pos)
+
+        box = CommentBoxItem(title="Comment")
+        box.setPos(scene_pos)
+        self.scene().addItem(box)
+
 
     def remove_node_item(self, node_id):
         if node_id not in self.node_items:
