@@ -32,6 +32,17 @@
     "using_tty": "Usar TTY",
     "close": "Cerrar",
 
+    "app_name": "Visual Bash Editor",
+    "app_tagline": "Una forma visual de crear scripts Bash",
+    "about_website": "Sitio web",
+    "about_report": "Reportar un problema",
+    "about_credits": "Créditos",
+    "about_legal": "Aviso legal",
+    "about_legal_text": "Este software se proporciona tal cual, sin ningún tipo de garantía.",
+    "about_whats_new": "Novedades",
+    "about_questions": "Preguntas frecuentes",
+    "about_support": "Apoya el proyecto",
+
     "Commands": "Comandos",
     "Flow": "Flujo",
     "Math": "Matemáticas",

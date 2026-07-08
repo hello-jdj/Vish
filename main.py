@@ -21,6 +21,7 @@ from ui.graph_view import GraphView
 from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
 from ui.menu_style import apply_btn_style, apply_menu_style
+from ui.about.about import AboutDialog
 from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
@@ -175,9 +176,8 @@ class VisualBashEditor(QMainWindow):
         dialog.exec()
 
     def open_about(self):
-        Debug.Log("About dialog not implemented yet")
+        AboutDialog(self).exec()
 
-    
     def save_graph(self):
         if not self.graph.nodes:
             Debug.Error(Traduction.get_trad("error_cannot_save_empty_graph", "Cannot save an empty graph."))
