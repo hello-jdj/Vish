@@ -1,4 +1,15 @@
-Developed by Lluciocc    
+### Code Contributor
+[GamerXD8991](https://github.com/GamerXD8991)                                   
+[kernbyte](https://github.com/kernbyte)                            
+
+### Translation Contributor
+
+[bonaccolto90](https://github.com/bonaccolto90) for Italian translation         
+[kernbyte](https://github.com/kernbyte) for Arabian translation                      
+[SpurGetreide54](https://github.com/SpurGetreide54) for German translation                             
+
+### Acknowledgements
+
 Inspired by Unreal Engine's Blueprint system    
 Every icon are from [Pictogrammers](https://pictogrammers.com/library/mdi/)      
 ANSI to HTML conversion code inspired from [ansi-to-html](https://github.com/pycontribs/ansi2html)    
