@@ -28,6 +28,10 @@ It can help beginners understand the structure and flow of Bash scripts, making 
 For more detailed information about Vish, including installation instructions, usage guides, and troubleshooting tips, please visit the [Wiki](https://github.com/lluciocc/vish/wiki).
 
 ## Installation
+### From Flathub
+You can install Vish directly from Flathub:
+https://flathub.org/apps/io.github.lluciocc.Vish
+
 ### From flatpak
 You can install Vish from a self hosted source using the following command:
 ```bash 
