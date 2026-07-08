@@ -83,38 +83,6 @@ class AddEdgeCommand(QUndoCommand):
         self.view.remove_edge_item(self.edge_id)
         self.edge_id = None
 
-
-class RemoveNodeCommand(QUndoCommand):
-    def __init__(self, view, node_id):
-        super().__init__("Remove Node")
-        self.view = view
-        self.graph = view.graph
-        self.node_id = node_id
-        self.node = self.graph.nodes.get(node_id)
-        self.edges = []
-
-        if self.node:
-            for port in self.node.inputs + self.node.outputs:
-                for e in port.connected_edges:
-                    self.edges.append((e.source, e.target))
-
-    def redo(self):
-        self.view.remove_node_item(self.node_id)
-
-    def undo(self):
-        if not self.node:
-            return
-
-        self.graph.add_node(self.node)
-        self.view.add_node_item(self.node)
-
-        for src_port, tgt_port in self.edges:
-            edge = self.graph.add_edge(src_port, tgt_port)
-            if edge:
-                self.view.add_edge_item(edge)
-
-
-
 class MoveNodeCommand(QUndoCommand):
     def __init__(self, view, node_id: str, old_pos, new_pos):
         super().__init__("Move Node")
