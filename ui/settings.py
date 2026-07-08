@@ -248,6 +248,11 @@ class SettingsDialog(QDialog):
         Config.CUSTOM_SHEBANG = new_value
         ConfigManager.save_config()
 
+    def update_combo_item(self, combo, data, key, fallback):
+        index = combo.findData(data)
+        if index != -1:
+            combo.setItemText(index, Traduction.get_trad(key, fallback))
+
     def refresh_ui_texts(self):
         self.setWindowTitle(
             Traduction.get_trad("settings", "Settings")
@@ -289,6 +294,16 @@ class SettingsDialog(QDialog):
         self.shebang_label.setText(
             Traduction.get_trad("custom_shebang", "Custom Shebang")
         )
+
+        self.update_combo_item(self.theme_combo, "dark", "theme_dark", "Dark")
+        self.update_combo_item(self.theme_combo, "purple", "theme_purple", "Purple")
+        self.update_combo_item(self.theme_combo, "white", "theme_white", "White")
+
+        self.update_combo_item(self.lang_combo, "en", "lang_en", "English")
+        self.update_combo_item(self.lang_combo, "fr", "lang_fr", "French")
+        self.update_combo_item(self.lang_combo, "es", "lang_es", "Spanish")
+        self.update_combo_item(self.lang_combo, "ar", "lang_ar", "Arabic")
+        self.update_combo_item(self.lang_combo, "it", "lang_it", "Italian")
 
         if self.parent():
             self.parent().refresh_ui_texts()
