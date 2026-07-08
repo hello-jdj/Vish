@@ -80,12 +80,21 @@ class Graph:
         self.nodes[node.id] = node
     
     def remove_node(self, node_id: str):
-        if node_id in self.nodes:
-            node = self.nodes[node_id]
-            for port in node.inputs + node.outputs:
-                for edge in port.connected_edges[:]:
-                    self.remove_edge(edge.id)
-            del self.nodes[node_id]
+        node = self.nodes.get(node_id)
+        if not node:
+            return
+
+        edges_to_remove = set()
+
+        for port in node.inputs + node.outputs:
+            for edge in port.connected_edges:
+                edges_to_remove.add(edge.id)
+
+        for edge_id in edges_to_remove:
+            self.remove_edge(edge_id)
+
+        del self.nodes[node_id]
+
     
     def add_edge(self, source: Port, target: Port) -> Optional[Edge]:
         if not source.can_connect_to(target):
