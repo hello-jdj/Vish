@@ -215,16 +215,47 @@ class AboutTextPage(QWidget):
         content.setMarkdown(text)
         content.setOpenExternalLinks(True)
         content.setFrameShape(QTextBrowser.NoFrame)
+
+        content.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        content.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        content.document().setDocumentMargin(0)
+
         content.setStyleSheet("""
-            QTextBrowser {
-                background: transparent;
-                border: none;
-                padding: 0;
-                opacity: 0.85;
-            }
+        QTextBrowser {
+            background: transparent;
+            border: none;
+            padding: 0;
+            opacity: 0.85;
+        }
+
+        QScrollBar:vertical {
+            background: transparent;
+            width: 8px;
+            margin: 2px;
+            border-radius: 4px;
+        }
+
+        QScrollBar::handle:vertical {
+            background: rgba(255, 255, 255, 120);
+            min-height: 30px;
+            border-radius: 4px;
+        }
+
+        QScrollBar::handle:vertical:hover {
+            background: rgba(255, 255, 255, 160);
+        }
+
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {
+            height: 0;
+            background: none;
+        }
+
+        QScrollBar::add-page:vertical,
+        QScrollBar::sub-page:vertical {
+            background: transparent;
+        }
         """)
 
         layout.addWidget(content)
-
-
-        layout.addStretch()
