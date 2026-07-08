@@ -260,6 +260,10 @@ class GraphView(QGraphicsView):
                     self.undo_stack.push(RemoveNodeCommand(self, item.node.id))
                 self.undo_stack.endMacro()
             return
+        if event.key() == Qt.Key_D and event.modifiers() & Qt.ControlModifier: # Ctrl+D
+            self.copy_selection()
+            self.paste()
+            return
         if event.matches(QKeySequence.Delete): # Ctrl+Delete
             node_items = [it for it in self.graph_scene.selectedItems() if isinstance(it, NodeItem)]
             if node_items:
