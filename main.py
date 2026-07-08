@@ -12,6 +12,7 @@ from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNod
 from ui.graph_view import GraphView
 from ui.palette import NodePalette
 from ui.property_panel import PropertyPanel
+from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 
 class NodeFactory:
     @staticmethod
@@ -45,6 +46,9 @@ class VisualBashEditor(QMainWindow):
         self.create_initial_graph()
     
     def setup_ui(self):
+        set_dark_theme()
+        #set_purple_theme()
+        #set_white_theme()
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
