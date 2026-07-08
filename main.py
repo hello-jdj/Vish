@@ -125,8 +125,7 @@ class VisualBashEditor(QMainWindow):
         self.graph_view.graph_scene.graph_changed.connect(
             self.generate_bash
         )
-
-
+        
         self.property_panel = PropertyPanel()
         splitter.addWidget(self.property_panel)
 
@@ -185,6 +184,7 @@ class VisualBashEditor(QMainWindow):
 
     def open_settings(self):
         dialog = SettingsDialog(self)
+        dialog.traduction_changed.connect(self.graph_view.rebuild_graph)
         dialog.exec()
 
     def open_about(self):
