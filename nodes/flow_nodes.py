@@ -96,3 +96,56 @@ class ForNode(BaseNode):
             start_node = next_port.connected_edges[0].target.node
             BaseNode.emit_exec_chain(start_node, context)
         return ""
+    
+@register_node("function", category="Flow", label="Function", description="Defines a bash function")
+class FunctionNode(BaseNode):
+    def __init__(self):
+        super().__init__("function", "Function", "#1ABC9C")
+        self.add_output("Exec", PortType.EXEC, "Function body")
+
+        self.properties["name"] = "my_function"
+
+    def emit_bash(self, context: BashContext) -> str:
+        name = self.properties.get("name", "my_function")
+        context.add_function_line(f"{name}() {{")
+
+        saved_indent = context.indent_level
+        context.indent_level = 1
+
+        body_port = self.outputs[0]
+        if body_port.connected_edges:
+            start_node = body_port.connected_edges[0].target.node
+            BaseNode.emit_exec_chain(start_node, context)
+
+        context.indent_level = saved_indent
+        context.add_function_line("}")
+
+        return ""
+    
+@register_node("call",category="Flow",label="Call Function",description="Calls a bash function")
+class CallNode(BaseNode):
+    def __init__(self):
+        super().__init__("call", "Call", "#F39C12")
+
+        self.add_input("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC)
+
+        self.properties["function"] = "my_function"
+
+    def emit_bash(self, context: BashContext) -> str:
+        return self.properties.get("function", "")
+    
+@register_node("return", category="Flow", label="Return", description="Return the result of a fonction")
+class ReturnNode(BaseNode):
+    def __init__(self):
+        super().__init__("return", "Return", "#E74C3C")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Value", PortType.STRING)
+
+    def emit_bash(self, context):
+        value = "0"
+        val_port = self.inputs[1]
+        if val_port.connected_edges:
+            src = val_port.connected_edges[0].source.node
+            value = src.properties.get("value", value)
+        return f"return {value}"
