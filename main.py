@@ -76,6 +76,12 @@ class VisualBashEditor(QMainWindow):
         set_theme_btn.setFixedHeight(generate_btn.sizeHint().height())
         toolbar.addWidget(set_theme_btn)
 
+        set_lang_btn = QComboBox()
+        set_lang_btn.addItems(["en", "fr", "es"])
+        set_lang_btn.currentTextChanged.connect(self.set_lang)
+        set_lang_btn.setFixedHeight(generate_btn.sizeHint().height())
+        toolbar.addWidget(set_lang_btn)
+
         toolbar.addStretch()
         main_layout.addLayout(toolbar)
 
@@ -204,6 +210,7 @@ class VisualBashEditor(QMainWindow):
         splitter.setSizes([900, 300, 400])
 
         Debug.Log(Traduction.get_trad("graph_loaded_successfully", f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
+    
     def set_theme(self, theme_name: str):
         if theme_name == "Dark":
             set_dark_theme()
@@ -213,6 +220,10 @@ class VisualBashEditor(QMainWindow):
             set_white_theme()
 
         self.graph_view.apply_theme()
+    
+    def set_lang(self, lang:str):
+        Traduction.set_translate_model(lang)
+        Debug.Log(Traduction.get_trad("lang_set", f"Language set to {lang}", lang=lang))
     
     def run_pty(self, script_path: str) -> str:
         master_fd, slave_fd = pty.openpty()
@@ -321,7 +332,7 @@ def main():
     app = QApplication(sys.argv)
     editor = VisualBashEditor()
     Debug.init(editor)
-    Traduction.set_translate_model("fr")
+    Traduction.set_translate_model("en")
     editor.show()
     sys.exit(app.exec())
 
