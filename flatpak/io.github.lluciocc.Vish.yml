@@ -1,7 +1,9 @@
 app-id: io.github.lluciocc.Vish
 runtime: org.kde.Platform
-runtime-version: "6.6"
+runtime-version: "6.10"
 sdk: org.kde.Sdk
+base: io.qt.PySide.BaseApp
+base-version: "6.10"
 command: vish
 
 finish-args:
@@ -19,11 +21,10 @@ modules:
       - install -d /app/vish
       - cp -r * /app/vish
       - install -d /app/bin
-      - echo '#!/bin/sh' > /app/bin/vish
-      - echo 'python3 /app/vish/main.py' >> /app/bin/vish
+      - printf '#!/bin/sh\nexec python3 /app/vish/main.py "$@"\n' > /app/bin/vish
       - chmod +x /app/bin/vish
-      - install -Dm644 assets/icons/icon.png /app/share/icons/hicolor/256x256/apps/io.github.lluciocc.Vish.png
-      - install -Dm644 io.github.lluciocc.Vish.desktop /app/share/applications/io.github.lluciocc.Vish.desktop
+      - install -Dm644 /app/vish/assets/icons/icon.png /app/share/icons/hicolor/256x256/apps/io.github.lluciocc.Vish.png
+      - install -Dm644 /app/vish/flatpak/io.github.lluciocc.Vish.desktop /app/share/applications/io.github.lluciocc.Vish.desktop
     sources:
       - type: dir
         path: ..
