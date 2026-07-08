@@ -25,6 +25,7 @@ from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
 from core.config import Config
+from core.debug import Info
 
 class NodeFactory:
     @staticmethod
@@ -269,6 +270,9 @@ class VisualBashEditor(QMainWindow):
         return output
     
     def run_bash(self):
+        if Info.get_os() == "Windows":
+            Debug.Error("Running bash scripts is not supported on Windows.")
+            return
         self.set_run_output_visible(True)
         bash_script = self.output_text.toPlainText()
         self.run_output_text.clear()
@@ -322,4 +326,9 @@ def main():
     sys.exit(app.exec())
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Application interrupted by user.")
+    except Exception as e:
+        print(f"Fatal error: {e}")
