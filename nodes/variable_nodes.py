@@ -17,7 +17,12 @@ class SetVariableNode(BaseNode):
     def emit_bash(self, context: BashContext) -> str:
         var_name = self.properties.get("variable", "VAR")
 
-        value_expr = f'"{self.properties.get("value", "")}"'
+        raw_value = self.properties.get("value", "")
+        if raw_value.isdigit() or raw_value.startswith("$") or raw_value.startswith('"') or raw_value.startswith("'") or raw_value.startswith('`'):
+            value_expr = raw_value
+        else:
+            value_expr = f'"{raw_value}"'
+
 
         value_port = self.inputs[1]
         if value_port.connected_edges:

@@ -11,9 +11,8 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 
 ## Screenshots
 
-![Screenshot2](screenshots/screenshot02.png)
-![Screenshot3](screenshots/screenshot03.png)
-![Screenshot1](screenshots/screenshot01.png)
+![Screenshot1](screenshots/screenshot1.png)
+![Screenshot2](screenshots/screenshot2.png)
 
 ## Credits
 - Developed by Lluciocc
