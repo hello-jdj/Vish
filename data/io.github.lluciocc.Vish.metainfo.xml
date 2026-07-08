@@ -31,20 +31,20 @@
   </developer>
 
   <content_rating type="oars-1.1"/>
-
+  
   <screenshots>
     <screenshot type="default">
       <caption>Node scripting workflow (1)</caption>
-      <image>https://github.com/Lluciocc/vish-utils/blob/main/screenshots/screenshots1.png</image>
+      <image>https://raw.githubusercontent.com/Lluciocc/vish-utils/main/screenshots/screenshots1.png</image>
     </screenshot>
     <screenshot>
       <caption>Node scripting workflow (2)</caption>
-      <image>https://github.com/Lluciocc/vish-utils/blob/main/screenshots/screenshots2.png</image>
+      <image>https://raw.githubusercontent.com/Lluciocc/vish-utils/main/screenshots/screenshots2.png</image>
     </screenshot>
   </screenshots>
 
   <releases>
-    <release version="1.0.3" date="2026-03-10">
+    <release version="1.0.3" date="2026-03-03">
       <description>
         <p>Improve UI and stablity</p>
       </description>
