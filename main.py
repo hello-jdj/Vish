@@ -499,6 +499,16 @@ class VisualBashEditor(QMainWindow):
             self.generate_bash()
         elif event.key() == Qt.Key_R and event.modifiers() & Qt.ControlModifier: # Ctrl+R
             self.run_bash()
+        elif event.key() == Qt.Key_F11: # F11
+            self.full_screen_action()
+        elif event.key() == Qt.Key_F1: # F1
+            self.open_keyboard_shortcuts()
+        elif event.key() == Qt.Key_F9: # F9
+            self.open_settings()
+        elif event.key() == Qt.Key_Escape: # Esc
+            if self.windowState() & Qt.WindowState.WindowFullScreen:
+                self.setWindowState(Qt.WindowState.WindowNoState)
+
         super().keyPressEvent(event)
 
 def main():
