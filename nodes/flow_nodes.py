@@ -1,5 +1,5 @@
 from core.port_types import PortType
-from core.bash_emitter import BashContext
+from core.bash_context import BashContext
 from nodes.registry import register_node
 from .base_node import BaseNode
 
@@ -109,18 +109,23 @@ class FunctionNode(BaseNode):
         name = self.properties.get("name", "my_function")
         context.add_function_line(f"{name}() {{")
 
-        saved_indent = context.indent_level
+        prev_buffer = context._current_buffer
+        prev_indent = context.indent_level
+        context._current_buffer = "function"
         context.indent_level = 1
 
         body_port = self.outputs[0]
         if body_port.connected_edges:
             start_node = body_port.connected_edges[0].target.node
             BaseNode.emit_exec_chain(start_node, context)
+        context.indent_level = prev_indent
+        context._current_buffer = prev_buffer
 
-        context.indent_level = saved_indent
         context.add_function_line("}")
+        context.add_function_line("")
 
         return ""
+
     
 @register_node("call",category="Flow",label="Call Function",description="Calls a bash function")
 class CallNode(BaseNode):
