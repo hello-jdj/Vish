@@ -123,12 +123,14 @@ class VisualBashEditor(QMainWindow):
             json_data = Serializer.serialize(self.graph)
             with open(file_path, 'w') as f:
                 f.write(json_data)
+            Debug.Log(f"Graph saved to {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
     
     def load_graph(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Load Graph", "", "JSON Files (*.json)"
         )
         if not file_path:
+            Debug.Error("No file selected for loading graph.")
             return
 
         with open(file_path, "r") as f:
@@ -150,6 +152,8 @@ class VisualBashEditor(QMainWindow):
 
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
+
+        Debug.Log(f"Graph loaded from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
 
     def set_theme(self, theme_fn):
         theme_fn()
