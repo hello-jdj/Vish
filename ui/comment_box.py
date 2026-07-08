@@ -17,6 +17,7 @@ class CommentBoxItem(QGraphicsRectItem):
         self.setZValue(-10)
 
         self.resize_margin = 10
+        self.title_bar_height = 32
         self.resizing = False
         self.resize_corner = None
         self.locked = False
@@ -38,13 +39,15 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def _update_title_position(self):
         r = self.rect()
-        max_width = r.width() - self.title_padding * 2
-        self.title_item.setTextWidth(max(50, max_width))
-        self.title_item.document().adjustSize()
+
+        width = r.width() * 0.9
+        self.title_item.setTextWidth(width)
+
         self.title_item.setPos(
-            self.title_padding,
+            (r.width() - width) * 0.5,
             self.title_padding
         )
+
 
 
     def _get_resize_corner(self, pos: QPointF):
@@ -112,7 +115,7 @@ class CommentBoxItem(QGraphicsRectItem):
             super().mousePressEvent(event)
             return
         if self.title_item.isUnderMouse():
-            event.ignore()
+            event.accept()
             return
 
         self.resize_corner = self._get_resize_corner(event.pos())
