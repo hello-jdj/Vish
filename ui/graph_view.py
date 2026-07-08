@@ -225,27 +225,42 @@ class GraphView(QGraphicsView):
         if isinstance(focus_item, QGraphicsTextItem):
             super().keyPressEvent(event)
             return
-        if event.matches(QKeySequence.Copy):
+        if event.matches(QKeySequence.Copy): # Ctrl+C
             self.copy_selection()
             return
-        if event.matches(QKeySequence.Paste):
+        if event.matches(QKeySequence.Paste): # Ctrl+V
             if self.clipboard.has_data():
                 view_pos = self.mapFromGlobal(QCursor.pos())
                 scene_pos = self.mapToScene(view_pos)
                 self.undo_stack.push(PasteCommand(self, self.clipboard.get(), scene_pos))
             return
-        if event.key() == Qt.Key_C:
+        if event.key() == Qt.Key_C: # C 
             self.create_comment_box()
             event.accept()
             return
-        if event.matches(QKeySequence.Undo):
+        if event.matches(QKeySequence.Undo): # Ctrl+Z
             self.undo_stack.undo()
             return
 
-        if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier):
+        if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier): # Ctrl+Shift+Z or Ctrl+Y
             self.undo_stack.redo()
             return
-        if event.key() == Qt.Key_Delete:
+        if event.matches(QKeySequence.SelectAll): # Ctrl+A
+            self.scene().clearSelection()
+            for item in self.scene().items():
+                if isinstance(item, NodeItem):
+                    item.setSelected(True)
+            return
+        if event.matches(QKeySequence.Cut): # Ctrl+X
+            self.copy_selection()
+            selected_node_items = self.get_selected_node_items()
+            if selected_node_items:
+                self.undo_stack.beginMacro("Cut")
+                for item in selected_node_items:
+                    self.undo_stack.push(RemoveNodeCommand(self, item.node.id))
+                self.undo_stack.endMacro()
+            return
+        if event.matches(QKeySequence.Delete): # Ctrl+Delete
             node_items = [it for it in self.graph_scene.selectedItems() if isinstance(it, NodeItem)]
             if node_items:
                 self.undo_stack.beginMacro("Delete")
@@ -254,7 +269,7 @@ class GraphView(QGraphicsView):
                 self.undo_stack.endMacro()
             event.accept()
             return
-        if event.key() == Qt.Key_F:
+        if event.key() == Qt.Key_F: # F
             self.auto_layout()
             return
 

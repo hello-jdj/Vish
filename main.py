@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout,
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
                                QSplitter, QFileDialog, QToolButton, QMenu)
 from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QKeySequence
 from core.graph import Graph
 from core.bash_emitter import BashEmitter
 from core.serializer import Serializer
@@ -22,6 +22,7 @@ from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
 from ui.menu_style import apply_btn_style, apply_menu_style
 from ui.about.about import AboutDialog
+from ui.keyboard_shortcuts import KeyboardShortcutsDialog
 from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
@@ -100,10 +101,16 @@ class VisualBashEditor(QMainWindow):
         )
         self.settings_action.triggered.connect(self.open_settings)
 
+        self.keyboard = self.more_menu.addAction(
+            Traduction.get_trad("keyboard_shortcuts", "Keyboard Shortcuts")
+        )
+        self.keyboard.triggered.connect(self.open_keyboard_shortcuts)
+
         self.about_action = self.more_menu.addAction(
             Traduction.get_trad("about", "About")
         )
         self.about_action.triggered.connect(self.open_about)
+
 
         self.more_btn.setMenu(self.more_menu)
         toolbar.addWidget(self.more_btn)
@@ -178,6 +185,9 @@ class VisualBashEditor(QMainWindow):
     def open_about(self):
         AboutDialog(self).exec()
 
+    def open_keyboard_shortcuts(self):
+        KeyboardShortcutsDialog(self).exec()
+        
     def save_graph(self):
         if not self.graph.nodes:
             Debug.Error(Traduction.get_trad("error_cannot_save_empty_graph", "Cannot save an empty graph."))
@@ -351,6 +361,17 @@ class VisualBashEditor(QMainWindow):
         self.more_btn.setToolTip(Traduction.get_trad("more_options", "More options"))
         self.settings_action.setText(Traduction.get_trad("settings", "Settings"))
         self.about_action.setText(Traduction.get_trad("about", "About"))
+
+    def keyPressEvent(self, event):
+        if event.matches(QKeySequence.Save): # Ctrl+S
+            self.save_graph()
+        elif event.matches(QKeySequence.Open): # Ctrl+O
+            self.load_graph()
+        elif event.key() == Qt.Key_G and event.modifiers() & Qt.ControlModifier: # Ctrl+G
+            self.generate_bash()
+        elif event.key() == Qt.Key_R and event.modifiers() & Qt.ControlModifier: # Ctrl+R
+            self.run_bash()
+        super().keyPressEvent(event)
 
 def main():
     ConfigManager.load_config() # Load config before setting theme and language
