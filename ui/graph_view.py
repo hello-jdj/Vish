@@ -36,11 +36,12 @@ class GraphView(QGraphicsView):
     def contextMenuEvent(self, event):
         scene_pos = self.mapToScene(event.pos())
         items = self.scene().items(scene_pos)
-        if not items:
-            self.show_node_palette(scene_pos)
-            event.accept()
-        else:
-            event.ignore()
+        if items:
+            super().contextMenuEvent(event)
+            return
+        
+        self.show_node_palette(scene_pos)
+        event.accept()
 
     def show_node_palette(self, scene_pos):
         if self._palette and self._palette.isVisible():
@@ -172,8 +173,6 @@ class GraphView(QGraphicsView):
 
         super().keyPressEvent(event)
 
-
-    
     def create_comment_box(self):
         view_pos = self.mapFromGlobal(QCursor.pos())
         scene_pos = self.mapToScene(view_pos)
