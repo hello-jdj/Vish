@@ -1,7 +1,6 @@
 from core.graph import Graph
 from nodes.base_node import BaseNode
 from core.bash_context import BashContext
-from core.config import Config
 
 class BashEmitter:
     def __init__(self, graph: Graph):
@@ -11,13 +10,11 @@ class BashEmitter:
         context = BashContext()
 
         header = [
-            "#!/bin/bash/env bash",
+            "#!/bin/bash",
             "",
             "# Generated from Visual Bash Editor",
             ""
         ]
-        if Config.CUSTOM_SHEBANG:
-            header[0] = Config.CUSTOM_SHEBANG
         for node in self.graph.nodes.values():
             if node.node_type == "function":
                 if node.id in context.emitted_nodes:

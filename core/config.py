@@ -9,7 +9,6 @@ class Config:
     AUTO_SAVE = False
     lang = "en"
     theme = "dark"
-    CUSTOM_SHEBANG = "#!/usr/bin/env bash"
     
 class ConfigManager:
     @staticmethod
