@@ -20,13 +20,14 @@ from ui.comment_box import CommentBoxItem
 from ui.graph_view import GraphView
 from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
+from ui.menu_style import apply_btn_style, apply_menu_style
 from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
 from core.config import Config, ConfigManager
 from core.debug import Info, Debug
 from core.traduction import Traduction
-from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
+from theme.theme import Theme, set_dark_theme, set_purple_theme, set_white_theme
 
 class NodeFactory:
     @staticmethod
@@ -87,19 +88,11 @@ class VisualBashEditor(QMainWindow):
         self.more_btn = QToolButton()
         self.more_btn.setText("⋮")
         self.more_btn.setPopupMode(QToolButton.InstantPopup)
-        self.more_btn.setToolTip(Traduction.get_trad("more_options", "More options"))
-        self.more_btn.setStyleSheet("""
-            QToolButton {
-                color: white;
-                font-size: 18px;
-                padding: 0 6px;
-            }
-            QToolButton::menu-indicator {
-                image: none;
-            }
-        """)
+        apply_btn_style(self.more_btn)
+
 
         self.more_menu = QMenu(self)
+        apply_menu_style(self.more_menu)
 
         self.settings_action = self.more_menu.addAction(
             Traduction.get_trad("settings", "Settings")
