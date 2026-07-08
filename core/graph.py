@@ -105,24 +105,32 @@ class Graph:
                 return node
         return None
     
-    def get_execution_order(self) -> List[Node]:
-        start = self.get_start_node()
+    def get_execution_order(self):
+        from core.port_types import PortType
+
+        visited = set()
+        ordered = []
+        start = None
+        for node in self.nodes.values():
+            if node.node_type == "start":
+                start = node
+                break
+
         if not start:
             return []
-        
-        visited = set()
-        order = []
-        
-        def traverse(node: Node):
+
+        def walk(node):
             if node.id in visited:
                 return
             visited.add(node.id)
-            order.append(node)
-            
-            exec_out = node.get_exec_output()
-            if exec_out and exec_out.connected_edges:
-                for edge in exec_out.connected_edges:
-                    traverse(edge.target.node)
-        
-        traverse(start)
-        return order
+            ordered.append(node)
+            for output in node.outputs:
+                if output.port_type != PortType.EXEC:
+                    continue
+
+                for edge in output.connected_edges:
+                    next_node = edge.target.node
+                    walk(next_node)
+
+        walk(start)
+        return ordered

@@ -14,6 +14,7 @@ class NodeItem(QGraphicsItem):
         super().__init__()
         self.node = node
         self.port_items = {}
+        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -82,3 +83,9 @@ class NodeItem(QGraphicsItem):
             port_item = self.port_items[port_id]
             return self.mapToScene(port_item.pos())
         return QPointF()
+
+    def mousePressEvent(self, event):
+        scene = self.scene()
+        if scene:
+            scene.node_selected.emit(self.node)
+        super().mousePressEvent(event)
