@@ -14,6 +14,16 @@ class BaseNode(Node):
     def emit_bash_value(self, context):
         return None
     
+    def get_next_exec_node(self):
+        exec_outputs = [
+            o for o in self.outputs
+            if o.port_type == PortType.EXEC and o.connected_edges
+        ]
+        if not exec_outputs:
+            return None
+
+        return exec_outputs[0].connected_edges[0].target.node
+    
     @staticmethod
     def emit_exec_chain(start_node, context, stop_at=None):
         current = start_node
@@ -30,11 +40,4 @@ class BaseNode(Node):
             if current == stop_at:
                 break
 
-            exec_outputs = [
-                o for o in current.outputs
-                if o.port_type == PortType.EXEC and o.connected_edges
-            ]
-            if not exec_outputs:
-                break
-
-            current = exec_outputs[0].connected_edges[0].target.node
+            current = current.get_next_exec_node()
