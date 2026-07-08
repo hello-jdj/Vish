@@ -23,6 +23,7 @@ It can help beginners understand the structure and flow of Bash scripts, making 
 
 
 ## Contributing
+### Coding
 Contributions are welcome! If you would like to contribute to Vish, please follow these steps:
 1. Fork the repository
 2. Create a new branch (`git checkout -b feature-branch`)
@@ -31,6 +32,15 @@ Contributions are welcome! If you would like to contribute to Vish, please follo
 5. Create a new Pull Request
 
 Note: Please ensure your code adheres to the existing coding style and includes appropriate tests.- This project is in active development. Features may change, and bugs may be present.
+
+### Translating
+An other way to contribute Vish is to help translating it in other languages. If you want to contribute to the translation of Vish, please follow these steps:
+1. Fork the repository
+2. Create a new branch (`git checkout -b translation-branch`)
+3. Create a new translation file in `assets/model/{language}.json` to add translations for the new language you want to add. **You can use the existing translations as a reference.**
+4. Commit your changes (`git commit -am 'Add translation for [Language]'`)
+5. Push to the branch (`git push origin translation-branch`)
+6. Create a new Pull Request
 
 ## Credits
 - Developed by Lluciocc
