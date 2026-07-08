@@ -29,6 +29,8 @@
     "advanced": "Advanced",
     "debug": "Debug mode",
     "using_tty": "Use TTY",
+    "sync_nodes_and_gen": "Sync Nodes and Generation",
+    "auto_save": "Auto Save",
     "close": "Close",
 
     "about": "About",

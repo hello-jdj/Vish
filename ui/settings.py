@@ -145,7 +145,15 @@ class SettingsDialog(QDialog):
         self.tty_row, self.tty_label = create_switch_row(
             "using_tty", "Use TTY", "USING_TTY"
         )
+        self.sync_row, self.sync_label = create_switch_row(
+            "sync_nodes_and_gen", "Sync Nodes and Generation", "SYNC_NODES_AND_GEN"
+        )
+        self.auto_save_row, self.auto_save_label = create_switch_row(
+            "auto_save", "Auto Save", "AUTO_SAVE"
+        )
         self.layout.addLayout(self.tty_row)
+        self.layout.addLayout(self.sync_row)
+        self.layout.addLayout(self.auto_save_row)
 
     def _build_footer(self):
         self.layout.addStretch()
@@ -217,6 +225,12 @@ class SettingsDialog(QDialog):
         )
         self.tty_label.setText(
             Traduction.get_trad("using_tty", "Use TTY")
+        )
+        self.sync_label.setText(
+            Traduction.get_trad("sync_nodes_and_gen", "Sync Nodes and Generation")
+        )
+        self.auto_save_label.setText(
+            Traduction.get_trad("auto_save", "Auto Save")
         )
 
         self.close_btn.setText(
