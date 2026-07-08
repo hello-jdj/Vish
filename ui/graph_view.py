@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem, QWidget, QHBoxLayout, QSlider, QLabel, QPushButton
 from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent, QPropertyAnimation, QEasingCurve, Property
-from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence
+from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence, QUndoStack
 from core.graph import Port
+from core.port_types import PortType
 from ui.palette import NodePalette
 from ui.graph_scene import GraphScene
 from ui.node_item import NodeItem
@@ -12,6 +13,7 @@ from core.clipboard import GraphClipboard
 from core.serializer import Serializer
 from nodes.registry import create_node
 from core.debug import Debug
+from commands.undo_commands import *
 
 class ZoomLabel(QLabel):
     def mouseDoubleClickEvent(self, event):
@@ -58,6 +60,14 @@ class GraphView(QGraphicsView):
         self._zoom_anim.setEasingCurve(QEasingCurve.OutCubic)
         self._zoom_anim.setDuration(120)
     #     self._init_minimap()
+        self._suspend_edge_undo = False
+        self.undo_stack = QUndoStack(self)
+        self.graph_scene.connection_created.connect(
+            lambda a, b: (
+                None if self._suspend_edge_undo
+                else self.undo_stack.push(AddEdgeCommand(self, a, b))
+            )
+        )
 
     def _get_zoom_anim_value(self):
         return self.scale_factor
@@ -113,8 +123,11 @@ class GraphView(QGraphicsView):
         node.x = scene_pos.x()
         node.y = scene_pos.y()
 
-        editor.graph.add_node(node)
-        node_item = self.add_node_item(node)
+        self.undo_stack.push(AddNodeCommand(self, node))
+        self.undo_stack.undo()
+        self.undo_stack.redo()
+        node_item = self.node_items.get(node.id)
+
 
         scene = self.scene()
         if scene.pending_port and scene.drag_edge:
@@ -214,24 +227,34 @@ class GraphView(QGraphicsView):
         if event.matches(QKeySequence.Copy):
             self.copy_selection()
             return
-
         if event.matches(QKeySequence.Paste):
-            view_pos = self.mapFromGlobal(QCursor.pos())
-            scene_pos = self.mapToScene(view_pos)
-            self.paste(scene_pos)
+            if self.clipboard.has_data():
+                view_pos = self.mapFromGlobal(QCursor.pos())
+                scene_pos = self.mapToScene(view_pos)
+                self.undo_stack.push(PasteCommand(self, self.clipboard.get(), scene_pos))
             return
         if event.key() == Qt.Key_C:
             self.create_comment_box()
             event.accept()
             return
+        if event.matches(QKeySequence.Undo):
+            self.undo_stack.undo()
+            return
 
+        if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier):
+            self.undo_stack.redo()
+            return
         if event.key() == Qt.Key_Delete:
-            for item in self.graph_scene.selectedItems():
-                if isinstance(item, NodeItem):
-                    self.remove_node_item(item.node.id)
-                elif isinstance(item, CommentBoxItem):
-                    self.graph_scene.removeItem(item)
+            node_items = [it for it in self.graph_scene.selectedItems() if isinstance(it, NodeItem)]
+            if node_items:
+                self.undo_stack.beginMacro("Delete")
+                for it in node_items:
+                    self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
+                self.undo_stack.endMacro()
             event.accept()
+            return
+        if event.key() == Qt.Key_F:
+            self.auto_layout()
             return
 
         super().keyPressEvent(event)
@@ -257,10 +280,11 @@ class GraphView(QGraphicsView):
                 or edge_item.target_port in node_item.port_items.values()
             ):
                 if edge_item.edge:
-                    self.graph.remove_edge(edge_item.edge.id)
+                    if edge_item.edge and edge_item.edge.id in self.graph.edges:
+                        self.graph.remove_edge(edge_item.edge.id)
                     if edge_item.edge.id in self.edge_items:
                         del self.edge_items[edge_item.edge.id]
-
+                        self.graph.remove_edge(edge_item.edge.id)
                 if edge_item.scene() is self.graph_scene:
                     self.graph_scene.removeItem(edge_item)
 
@@ -345,6 +369,44 @@ class GraphView(QGraphicsView):
 
         self.paste_offset = (self.paste_offset[0] + 10, self.paste_offset[1] + 10)
         Debug.Log(f"Pasted {len(nodes_data)} nodes")
+
+    def auto_layout(self, start_nodes=None, x_spacing=260, y_spacing=140):
+        if start_nodes is None:
+            start_nodes = [
+                n for n in self.graph.nodes.values()
+                if any(p.port_type == PortType.EXEC for p in n.outputs)
+            ]
+
+        visited = set()
+        levels = {}
+
+        def walk(node, depth):
+            if node.id in visited:
+                return
+            visited.add(node.id)
+
+            levels.setdefault(depth, []).append(node)
+
+            for out in node.outputs:
+                if out.port_type != PortType.EXEC:
+                    continue
+                for edge in out.connected_edges:
+                    walk(edge.target.node, depth + 1)
+
+        for n in start_nodes:
+            walk(n, 0)
+
+        for depth, nodes in levels.items():
+            for i, node in enumerate(nodes):
+                x = depth * x_spacing
+                y = i * y_spacing
+                node.x = x
+                node.y = y
+                item = self.node_items.get(node.id)
+                if item:
+                    item.setPos(x, y)
+                    self.graph_scene.update_edges_for_node(item)
+
 
     def apply_theme(self):
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))

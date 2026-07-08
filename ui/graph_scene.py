@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QGraphicsScene
 from PySide6.QtCore import Signal, QTimer
 from PySide6.QtGui import QCursor, QPen, QColor
 from core.debug import Debug
+from ui import edge_item
 from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
 from core.port_types import PortDirection
@@ -101,14 +102,11 @@ class GraphScene(QGraphicsScene):
         self.pending_scene_pos = None
 
         def commit():
-            core_edge = self.graph.add_edge(source_item.port, target_item.port)
-            if not core_edge:
-                self._show_invalid_feedback(source_item, target_item)
-                if edge_item.scene() is self:
-                    self.removeItem(edge_item)
-                return
-            edge_item.edge = core_edge
-            self.edges.append(edge_item)
+            edge = self.graph.add_edge(source_item.port, target_item.port)
+            if edge:
+                self.views()[0].add_edge_item(edge)
+            if edge_item.scene() is self:
+                self.removeItem(edge_item)
 
         QTimer.singleShot(0, commit)
 
