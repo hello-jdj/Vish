@@ -12,7 +12,7 @@ class BashEmitter:
         header = [
             "#!/bin/bash",
             "",
-            "# Generated from Visual Bash Editor (Vish)",
+            "# Generated from Visual Bash Editor",
             ""
         ]
         for node in self.graph.nodes.values():
