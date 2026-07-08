@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout,
     QLabel, QComboBox, QPushButton,
-    QFrame, QWidget
+    QFrame, QWidget, QLineEdit, QMessageBox
 )
 from PySide6.QtCore import Qt, QPropertyAnimation, Property, Signal
 from PySide6.QtGui import QPainter, QColor
@@ -152,6 +152,20 @@ class SettingsDialog(QDialog):
         self.auto_save_row, self.auto_save_label = create_switch_row(
             "auto_save", "Auto Save", "AUTO_SAVE"
         )
+        self.shebang_label = QLabel(
+            Traduction.get_trad("custom_shebang", "Custom Shebang")
+        )
+
+        self.shebang_input = QLineEdit()
+        self.shebang_input.setText(Config.CUSTOM_SHEBANG)
+        self.shebang_input.editingFinished.connect(self.on_shebang_changed)
+
+        shebang_row = QHBoxLayout()
+        shebang_row.addWidget(self.shebang_label)
+        shebang_row.addStretch()
+        shebang_row.addWidget(self.shebang_input)
+
+        self.layout.addLayout(shebang_row)
         self.layout.addLayout(self.tty_row)
         self.layout.addLayout(self.sync_row)
         self.layout.addLayout(self.auto_save_row)
@@ -202,6 +216,32 @@ class SettingsDialog(QDialog):
 
         self.refresh_ui_texts()
 
+    def on_shebang_changed(self):
+        new_value = self.shebang_input.text().strip()
+
+        if not new_value:
+            self.shebang_input.setText(Config.CUSTOM_SHEBANG)
+            return
+
+        if new_value == Config.CUSTOM_SHEBANG:
+            return
+
+        reply = QMessageBox.warning(
+            self,
+            "Warning",
+            "Changing the shebang may break script execution on some systems.\n\n"
+            "Are you sure you know what you are doing?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.No:
+            self.shebang_input.setText(Config.CUSTOM_SHEBANG)
+            return
+
+        Config.CUSTOM_SHEBANG = new_value
+        ConfigManager.save_config()
+
     def refresh_ui_texts(self):
         self.setWindowTitle(
             Traduction.get_trad("settings", "Settings")
@@ -239,6 +279,9 @@ class SettingsDialog(QDialog):
 
         self.close_btn.setText(
             Traduction.get_trad("close", "Close")
+        )
+        self.shebang_label.setText(
+            Traduction.get_trad("custom_shebang", "Custom Shebang")
         )
 
         if self.parent():
