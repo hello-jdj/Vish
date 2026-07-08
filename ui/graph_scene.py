@@ -67,7 +67,6 @@ class GraphScene(QGraphicsScene):
 
         if not self._is_valid_connection(start_port, end_port):
             self._show_invalid_feedback(start_port, end_port)
-            self._cancel_drag_edge()
             return
 
         a = start_port.port
@@ -172,10 +171,12 @@ class GraphScene(QGraphicsScene):
         edge.setPen(QPen(QColor("#E74C3C"), 3))
 
         def cleanup():
-            if edge.scene() is self:
+            if edge.scene():
                 self.removeItem(edge)
 
         QTimer.singleShot(180, cleanup)
+        self.drag_edge = None
+        self.start_port = None
 
     def add_core_edge(self, core_edge, node_items):
         src_node_item = node_items[core_edge.source.node.id]
