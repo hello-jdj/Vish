@@ -51,10 +51,6 @@ class VisualBashEditor(QMainWindow):
         main_layout = QVBoxLayout(central_widget)
         
         toolbar = QHBoxLayout()
-
-        add_node_btn = QPushButton("Add Node")
-        add_node_btn.clicked.connect(self.show_node_palette)
-        toolbar.addWidget(add_node_btn)
         
         generate_btn = QPushButton("Generate Bash")
         generate_btn.clicked.connect(self.generate_bash)
@@ -71,7 +67,7 @@ class VisualBashEditor(QMainWindow):
         set_theme_btn = QComboBox()
         set_theme_btn.addItems(["Dark", "Purple", "White"])
         set_theme_btn.currentTextChanged.connect(self.set_theme)
-        set_theme_btn.setFixedHeight(add_node_btn.sizeHint().height())
+        set_theme_btn.setFixedHeight(generate_btn.sizeHint().height())
         toolbar.addWidget(set_theme_btn)
 
         toolbar.addStretch()
@@ -105,11 +101,6 @@ class VisualBashEditor(QMainWindow):
         self.graph.add_node(start_node)
         self.graph_view.add_node_item(start_node)
     
-    def show_node_palette(self):
-        palette = NodePalette(self)
-        palette.node_selected.connect(self.add_node)
-        palette.show()
-    
     def add_node(self, node_type: str):
         node = self.node_factory.create_node(node_type)
         if node:
@@ -119,12 +110,18 @@ class VisualBashEditor(QMainWindow):
             self.graph_view.add_node_item(node)
     
     def generate_bash(self):
+        if not self.graph.nodes:
+            Debug.Warn("Generating graph from an empty graph.")
         print(f"EDGES: {len(self.graph.edges)}")
         emitter = BashEmitter(self.graph)
         bash_script = emitter.emit()
         self.output_text.setPlainText(bash_script)
     
     def save_graph(self):
+        if not self.graph.nodes:
+            Debug.Warn("Cannot save an empty graph.")
+            return
+
         file_path, _ = QFileDialog.getSaveFileName(
             self, "Save Graph", "", "JSON Files (*.json)"
         )
