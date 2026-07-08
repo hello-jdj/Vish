@@ -2,7 +2,8 @@ import sys
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
                                QSplitter, QFileDialog)
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QRectF
+from PySide6.QtGui import QColor
 from core.graph import Graph
 from core.bash_emitter import BashEmitter
 from core.serializer import Serializer
@@ -12,6 +13,7 @@ from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode
 from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNode
 from nodes.operation_nodes import Addition
 from nodes.utils_node import ToString
+from ui.comment_box import CommentBoxItem
 from ui.graph_view import GraphView
 from ui.palette import NodePalette
 from ui.property_panel import PropertyPanel
@@ -120,7 +122,7 @@ class VisualBashEditor(QMainWindow):
             self, "Save Graph", "", "JSON Files (*.json)"
         )
         if file_path:
-            json_data = Serializer.serialize(self.graph)
+            json_data = Serializer.serialize(self.graph, self.graph_view)
             with open(file_path, 'w') as f:
                 f.write(json_data)
             Debug.Log(f"Graph saved to {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
@@ -136,7 +138,8 @@ class VisualBashEditor(QMainWindow):
         with open(file_path, "r") as f:
             json_data = f.read()
 
-        self.graph = Serializer.deserialize(json_data, self.node_factory)
+        self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
+
 
         splitter = self.graph_view.parent()
         old_view = self.graph_view
@@ -153,6 +156,16 @@ class VisualBashEditor(QMainWindow):
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
         
+        for c in comments:
+            box = CommentBoxItem(
+                rect=QRectF(0, 0, c["w"], c["h"]),
+                title=c["title"]
+            )
+            box.setPos(c["x"], c["y"])
+            box.setBrush(QColor(*c["color"]))
+            box.set_locked(c.get("locked", False))
+            self.graph_view.scene().addItem(box)
+                
         splitter.setSizes([900, 300, 400])
 
         Debug.Log(f"Graph loaded from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")

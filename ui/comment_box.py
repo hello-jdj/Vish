@@ -157,8 +157,6 @@ class CommentBoxItem(QGraphicsRectItem):
             self.setPos(orig_pos.x() + (orig.width() - w), orig_pos.y() + (orig.height() - h))
             self.setRect(QRectF(0, 0, w, h))
 
-
-        self.setRect(r.normalized())
         self._update_title_position()
 
     def mouseReleaseEvent(self, event):
