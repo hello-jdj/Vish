@@ -19,8 +19,8 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 
 ## Screenshots
 
-<img width="3072" height="1664" Workflow management projectsalt="Screenshot of Vish showing nodes and generated bash script with a script that call function that print the license file" src="https://github.com/Lluciocc/vish-utils/blob/main/screenshots/screenshots1.png" />
-<img width="3072" height="1728" alt="Screenshot of Vish showing nodes and generated bash script with a simple script that tell if a number is odd or even" src="https://github.com/Lluciocc/vish-utils/blob/main/screenshots/screenshots2.png" />
+<img width="3072" height="1664" Workflow management projectsalt="Screenshot of Vish showing nodes and generated bash script with a script that call function that print the license file" src="https://raw.githubusercontent.com/Lluciocc/vish-utils/refs/heads/main/screenshots/screenshots1.png" />
+<img width="3072" height="1728" alt="Screenshot of Vish showing nodes and generated bash script with a simple script that tell if a number is odd or even" src="https://raw.githubusercontent.com/Lluciocc/vish-utils/refs/heads/main/screenshots/screenshots2.png" />
 
 ## Notes
 
@@ -46,4 +46,4 @@ You can find the list of contributors and acknowledgements in the [CREDITS file]
 If you have any questions, suggestions, or want to contribute to the project, feel free to reach out through the [Matrix room](https://matrix.to/#/%23vish-support%3Amatrix.org) or by opening an issue on the GitHub repository.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE file](LICENSE) for details
+This project is licensed under the GPL3 License. See the [LICENSE file](LICENSE) for details
