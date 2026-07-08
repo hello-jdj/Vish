@@ -73,23 +73,28 @@ class VisualBashEditor(QMainWindow):
 
         self.generate_btn = QPushButton(Traduction.get_trad("btn_generate_bash", "Generate Bash"))
         self.generate_btn.clicked.connect(self.generate_bash)
+        apply_icon_for_btn(self.generate_btn, "generate")
         toolbar.addWidget(self.generate_btn)
 
         self.save_btn = QPushButton(Traduction.get_trad("btn_save", "Save"))
+        apply_icon_for_btn(self.save_btn, "save")
         self.save_btn.clicked.connect(self.save_graph)
         toolbar.addWidget(self.save_btn)
 
         self.load_btn = QPushButton(Traduction.get_trad("btn_load", "Load"))
         self.load_btn.clicked.connect(self.load_graph)
+        apply_icon_for_btn(self.load_btn, "load")
         toolbar.addWidget(self.load_btn)
 
         toolbar.addStretch()
 
         self.run_bash_btn = QPushButton(Traduction.get_trad("btn_run_bash", "Run Bash Script"))
         self.run_bash_btn.clicked.connect(self.run_bash)
+        apply_icon_for_btn(self.run_bash_btn, "play")
         toolbar.addWidget(self.run_bash_btn)
 
         self.copy_btn = QPushButton(Traduction.get_trad("btn_copy_clipboard", "Copy to Clipboard"))
+        apply_icon_for_btn(self.copy_btn, "clipboard")
         self.copy_btn.clicked.connect(
             lambda: QApplication.clipboard().setText(self.output_text.toPlainText())
         )
@@ -116,6 +121,11 @@ class VisualBashEditor(QMainWindow):
         self.keyboard.triggered.connect(self.open_keyboard_shortcuts)
         apply_icon_for_btn(self.keyboard, "keyboard")
 
+        self.full_screenfs = self.more_menu.addAction(
+            Traduction.get_trad("full_screen", "Full Screen")
+        )
+        self.full_screenfs.triggered.connect(self.full_screen_action)
+        apply_icon_for_btn(self.full_screenfs, "fullscreen")
         self.about_action = self.more_menu.addAction(
             Traduction.get_trad("about", "About")
         )
@@ -194,6 +204,12 @@ class VisualBashEditor(QMainWindow):
 
     def open_about(self):
         AboutDialog(self).exec()
+
+    def full_screen_action(self):
+        if self.windowState() & Qt.WindowState.WindowFullScreen:
+            self.setWindowState(Qt.WindowState.WindowNoState)
+        else:
+            self.setWindowState(Qt.WindowState.WindowFullScreen)
 
     def open_keyboard_shortcuts(self):
         KeyboardShortcutsDialog(self).exec()
@@ -447,6 +463,12 @@ class VisualBashEditor(QMainWindow):
         apply_icon_for_btn(self.settings_action, "settings")
         apply_icon_for_btn(self.about_action, "about")
         apply_icon_for_btn(self.keyboard, "keyboard")
+        apply_icon_for_btn(self.generate_btn, "generate")
+        apply_icon_for_btn(self.load_btn, "load")
+        apply_icon_for_btn(self.run_bash_btn, "play")
+        apply_icon_for_btn(self.copy_btn, "clipboard")
+        apply_icon_for_btn(self.save_btn, "save")
+        apply_icon_for_btn(self.full_screenfs, "fullscreen")
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Save): # Ctrl+S
