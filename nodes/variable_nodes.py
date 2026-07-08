@@ -54,7 +54,7 @@ class FileExistsNode(BaseNode):
     def __init__(self):
         super().__init__("file_exists", "File Exists", "#1ABC9C")
         self.add_input("Path", PortType.PATH, "File path")
-        self.add_output("Result", PortType.STRING, "Existence check result")
+        self.add_output("Result", PortType.CONDITION, "Existence check result")
         self.properties["path"] = ""
     
     def emit_bash(self, context: BashContext) -> str:
@@ -65,4 +65,4 @@ class FileExistsNode(BaseNode):
             source_node = path_port.connected_edges[0].source.node
             path = source_node.properties.get("value", path)
         
-        return f'-f "{path}"'
+        return f'[ -f "{path}" ]'
