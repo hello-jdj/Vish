@@ -187,6 +187,7 @@ class SettingsDialog(QDialog):
             self.parent().graph_view.apply_theme()
             apply_menu_style(self.parent().more_menu)
             apply_btn_style(self.parent().more_btn)
+            self.parent().refresh_ui_texts()
 
     def on_lang_changed(self):
         lang = self.lang_combo.currentData()

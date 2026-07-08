@@ -20,7 +20,7 @@ from ui.comment_box import CommentBoxItem
 from ui.graph_view import GraphView
 from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
-from ui.menu_style import apply_btn_style, apply_menu_style
+from ui.menu_style import apply_btn_style, apply_menu_style, apply_icon_for_btn
 from ui.about.about import AboutDialog
 from ui.keyboard_shortcuts import KeyboardShortcutsDialog
 from nodes.registry import NODE_REGISTRY
@@ -100,16 +100,19 @@ class VisualBashEditor(QMainWindow):
             Traduction.get_trad("settings", "Settings")
         )
         self.settings_action.triggered.connect(self.open_settings)
+        apply_icon_for_btn(self.settings_action, "settings")
 
         self.keyboard = self.more_menu.addAction(
             Traduction.get_trad("keyboard_shortcuts", "Keyboard Shortcuts")
         )
         self.keyboard.triggered.connect(self.open_keyboard_shortcuts)
+        apply_icon_for_btn(self.keyboard, "keyboard")
 
         self.about_action = self.more_menu.addAction(
             Traduction.get_trad("about", "About")
         )
         self.about_action.triggered.connect(self.open_about)
+        apply_icon_for_btn(self.about_action, "about")
 
 
         self.more_btn.setMenu(self.more_menu)
@@ -367,6 +370,10 @@ class VisualBashEditor(QMainWindow):
         self.settings_action.setText(Traduction.get_trad("settings", "Settings"))
         self.about_action.setText(Traduction.get_trad("about", "About"))
         self.keyboard.setText(Traduction.get_trad("keyboard_shortcuts", "Keyboard Shortcuts"))
+
+        apply_icon_for_btn(self.settings_action, "settings")
+        apply_icon_for_btn(self.about_action, "about")
+        apply_icon_for_btn(self.keyboard, "keyboard")
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Save): # Ctrl+S
