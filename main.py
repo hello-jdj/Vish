@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
-                               QSplitter, QFileDialog)
+                               QSplitter, QFileDialog, QComboBox)
 from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QColor
 from core.graph import Graph
@@ -66,7 +66,13 @@ class VisualBashEditor(QMainWindow):
         load_btn = QPushButton("Load")
         load_btn.clicked.connect(self.load_graph)
         toolbar.addWidget(load_btn)
-        
+
+        set_theme_btn = QComboBox()
+        set_theme_btn.addItems(["Dark", "Purple", "White"])
+        set_theme_btn.currentTextChanged.connect(self.set_theme)
+        set_theme_btn.setFixedHeight(add_node_btn.sizeHint().height())
+        toolbar.addWidget(set_theme_btn)
+
         toolbar.addStretch()
         main_layout.addLayout(toolbar)
 
@@ -90,7 +96,6 @@ class VisualBashEditor(QMainWindow):
             self.property_panel.set_node
         )
 
-    
     def create_initial_graph(self):
         start_node = StartNode()
         start_node.x = 100
@@ -170,9 +175,15 @@ class VisualBashEditor(QMainWindow):
 
         Debug.Log(f"Graph loaded from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
 
-    def set_theme(self, theme_fn):
-        theme_fn()
-        self.graph_view.scene().update()
+    def set_theme(self, theme_name: str):
+        if theme_name == "Dark":
+            set_dark_theme()
+        elif theme_name == "Purple":
+            set_purple_theme()
+        elif theme_name == "White":
+            set_white_theme()
+
+        self.graph_view.apply_theme()
 
 
 def main():
