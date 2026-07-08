@@ -20,4 +20,3 @@ class Traduction:
             return text.format(**kwargs)
         except Exception:
             return text
-        
