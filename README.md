@@ -67,6 +67,34 @@ An other way to contribute Vish is to help translating it in other languages. If
 7. Push to the branch (`git push origin translation-branch`)
 8. Create a new Pull Request
 
+## Node Notation Convention
+
+To simplify discussions about existing and new nodes, Vish uses a standardized node signature notation.
+
+The format is:
+`<Inputs> - <Outputs>`
+
+Each side describes the number and type of pins using the following identifiers:
+
+| Identifier | Type |
+|------------|------|
+| E | Execution / Control Flow |
+| S | String |
+| I | Integer |
+| B | Boolean |
+| P | Path |
+| V | Variable |
+| C | Condition |
+
+### Examples
+
+- `1S-2S` → 1 String input, 2 String outputs  
+- `1E-3E` → 1 Execution input, 3 Execution outputs  
+- `2S1I-1S` → 2 String inputs, 1 Integer input, 1 String output  
+
+This notation is used for <ins>**documentation and design discussions only**</ins>.  
+It reflects the internal type system and ensures consistency across the project.
+
 ## Credits
 You can find the list of contributors and acknowledgements in the [CREDITS](assets/markdown/CREDITS.md) file.
 
