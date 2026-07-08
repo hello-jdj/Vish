@@ -1,5 +1,10 @@
+import platform
+IS_WINDOWS = sys.platform == "win32"
+
+if not IS_WINDOWS:
+    import pty
+
 import os
-import pty
 import sys
 import subprocess
 import time
