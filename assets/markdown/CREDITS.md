@@ -3,6 +3,7 @@
 [kernbyte](https://github.com/kernbyte)            
 [mahaveergurjar](https://github.com/mahaveergurjar)                  
 [Half-and-Xat](https://github.com/Half-and-Xat)
+[EmiyaSyahriel](https://github.com/EmiyaSyahriel)
 
 ### Translation Contributor
 
