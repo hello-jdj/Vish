@@ -25,7 +25,7 @@ Vish is made for educational purposes and to simplify the process of creating Ba
 It can help beginners understand the structure and flow of Bash scripts, making it easier to learn scripting concepts.
 
 ## Wiki
-For more detailed information about Vish, including installation instructions, usage guides, and troubleshooting tips, please visit the [Wiki](https://github.com/lluciocc/vish/wiki).
+For more detailed information about Vish, including contribution instructions, usage guides, and troubleshooting tips, please visit the [Wiki](https://github.com/lluciocc/vish/wiki).
 
 ## Installation
 ### From Flathub
@@ -43,66 +43,6 @@ You can download the latest AppImage from the [releases page](https://github.com
 chmod +x Vish-*.AppImage
 ./Vish-*.AppImage
 ```
-
-## Contributing
-### Coding
-Contributions are welcome! If you would like to contribute to Vish, please follow these steps:
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature-branch`)
-3. Make your changes and commit them (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature-branch`)
-5. Create a new Pull Request
-6. Optional: Consider adding a screenshot of your work in the PR description.
-
-Note: Please ensure your code adheres to the existing coding style and includes appropriate tests.- This project is in active development. Features may change, and bugs may be present.
-
-### Translating
-An other way to contribute Vish is to help translating it in other languages. If you want to contribute to the translation of Vish, please follow these steps:
-1. Fork the repository
-2. Create a new branch (`git checkout -b translation-branch`)
-3. Create a new translation file in `assets/model/{language}.json` to add translations for the new language you want to add. **You can use the existing translations as a reference.**
-4. Add the translations for the new language in the newly created file (Use a basic translator if you don't know the language, but please try to be as accurate as possible) and make sure to include translations for the language name (e.g. "lang_en", "lang_fr", etc.) so that it can be displayed in the settings.
-5. Add the new language to the language combo box in `ui/settings.py` (You should update `_build_language_section` to add the new language to the combo box and also update `refresh_ui_texts` function to update the language name in the combo box when the language is changed with `update_combo_item` function)
-6. Commit your changes (`git commit -am 'Add translation for [Language]'`)
-7. Push to the branch (`git push origin translation-branch`)
-8. Create a new Pull Request
-9. To ensure your translation is correct, you can check it using [this script](https://github.com/Lluciocc/vish-utils/blob/main/check_trad.py)
- or by typing `bot, check [your_file.json]` in the PR comments.
-
-**Note:** If your file contains additional keys, they will be flagged as extra keys. These should only be present if you have added something to the UI. If any keys are missing, please correct them before requesting a review.
-
-## Node Notation Convention
-
-To simplify discussions about existing and new nodes, Vish uses a standardized node signature notation.
-
-The format is:
-`<Inputs> - <Outputs>`
-
-Each side describes the number and type of pins using the following identifiers:
-
-| Identifier | Type |
-|------------|------|
-| E | Execution / Control Flow |
-| S | String |
-| I | Integer |
-| B | Boolean |
-| P | Path |
-| V | Variable |
-| C | Condition |
-| n |	any number possible | 
-| m |	minimum required number |
-| x |	maximum allowed number |
-| a |	Array |
-
-### Examples
-
-- `1S-2S` → 1 String input, 2 String outputs  
-- `1E-3E` → 1 Execution input, 3 Execution outputs  
-- `2S1I-1S` → 2 String inputs, 1 Integer input, 1 String output
-- `1E-nE` → 1 Execution input, Any number of outputs possible.
-
-This notation is used for <ins>**documentation and design discussions only**</ins>.  
-It reflects the internal type system and ensures consistency across the project.
 
 ## Credits
 You can find the list of contributors and acknowledgements in the [CREDITS](assets/markdown/CREDITS.md) file.
